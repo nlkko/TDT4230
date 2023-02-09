@@ -31,6 +31,7 @@ struct SceneNode {
 
 	}
 
+
 	// A list of all children that belong to this node.
 	// For instance, in case of the scene graph of a human body shown in the assignment text, the "Upper Torso" node would contain the "Left Arm", "Right Arm", "Head" and "Lower Torso" nodes in its list of children.
 	std::vector<SceneNode*> children;
@@ -41,7 +42,11 @@ struct SceneNode {
 	glm::vec3 scale;
 
 	// A transformation matrix representing the transformation of the node's location relative to its parent. This matrix is updated every frame.
-	glm::mat4 currentTransformationMatrix;
+
+    glm::mat4 currentTransformationMatrix;
+
+    // Just model from MVP
+    glm::mat4 MVP;
 
 	// The location of the node's reference point
 	glm::vec3 referencePoint;
