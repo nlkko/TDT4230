@@ -378,6 +378,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 
     node->currentTransformationMatrix = transformationThusFar * transformationMatrix;
     node->MVP = VP * node->currentTransformationMatrix;
+    node->normal = glm::mat3( transpose( inverse( node->currentTransformationMatrix ) ) );
 
     switch(node->nodeType) {
         case GEOMETRY: break;
@@ -399,8 +400,12 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 void renderNode(SceneNode* node) {
     // M
     glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(node->currentTransformationMatrix));
+
     // MVP
     glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
+
+    // Normal
+    glUniformMatrix3fv(5, 1, GL_FALSE, glm::value_ptr(node->normal));
 
     switch(node->nodeType) {
         case GEOMETRY:

@@ -43,9 +43,13 @@ struct SceneNode {
 
 	// A transformation matrix representing the transformation of the node's location relative to its parent. This matrix is updated every frame.
 
+    // Model
     glm::mat4 currentTransformationMatrix;
 
-    // Just model from MVP
+    // Normal
+    glm::mat3 normal;
+
+    // MVP
     glm::mat4 MVP;
 
 	// The location of the node's reference point
