@@ -3,7 +3,10 @@
 in layout(location = 0) vec3 normal;
 in layout(location = 1) vec2 textureCoordinates;
 
-uniform float ambient_color = 1.0;
+uniform layout(location = 6) int N_LIGHTS;
+
+const float ambient_strength = 0.75;
+const vec3 ambient_color = vec3(1.0);
 
 out vec4 color;
 
