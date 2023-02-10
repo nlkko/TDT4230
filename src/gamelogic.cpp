@@ -39,7 +39,9 @@ SceneNode* ballNode;
 SceneNode* padNode;
 
 double ballRadius = 3.0f;
+
 glm::mat4 VP;
+const int N_LIGHTS = 3;
 
 // These are heap allocated, because they should not be initialised at the start of the program
 sf::SoundBuffer* buffer;
@@ -99,7 +101,6 @@ struct LightSource {
     glm::vec3 color;
 };
 
-const int N_LIGHTS = 3;
 LightSource lightSources[N_LIGHTS];
 
 
@@ -378,6 +379,8 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 
     node->currentTransformationMatrix = transformationThusFar * transformationMatrix;
     node->MVP = VP * node->currentTransformationMatrix;
+
+    // Does this need to be normalised before sending? Ambiguous task text
     node->normal = glm::mat3( transpose( inverse( node->currentTransformationMatrix ) ) );
 
     switch(node->nodeType) {
@@ -406,6 +409,9 @@ void renderNode(SceneNode* node) {
 
     // Normal
     glUniformMatrix3fv(5, 1, GL_FALSE, glm::value_ptr(node->normal));
+
+    // Number of active light sources
+    glUniform1i(6, N_LIGHTS);
 
     switch(node->nodeType) {
         case GEOMETRY:
