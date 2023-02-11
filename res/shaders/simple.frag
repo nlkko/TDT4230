@@ -2,11 +2,14 @@
 
 in layout(location = 0) vec3 normal;
 in layout(location = 1) vec2 textureCoordinates;
-in layout(location = 2) vec4 position;
+in layout(location = 2) vec3 position;
 
 // TODO: Getting error "non constant expression for array size" if i try to send value from CPU, any circumvention?
 const int N_LIGHTS = 3;
-uniform layout(location = 7) vec4 light_position[N_LIGHTS];
+uniform layout(location = 7) vec3 light_position[N_LIGHTS];
+uniform layout(location = 100) vec4 test2;
+
+const vec3 test_light_position = vec3(0.0);
 
 const float ambient_strength = 0.1;
 const vec3 ambient_color = vec3(1.0);

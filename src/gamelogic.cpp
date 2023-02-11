@@ -136,8 +136,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     }
 
     // Light positions
-    lightSources[0].relative_position = glm::vec3(0.0);
-    lightSources[1].relative_position = glm::vec3(10.0);
+    lightSources[0].relative_position = glm::vec3(100000.0);
+    lightSources[1].relative_position = glm::vec3(100000.0);
 
     // Fill buffers
     unsigned int ballVAO = generateBuffer(sphere);
@@ -421,6 +421,7 @@ void renderNode(SceneNode* node) {
         case POINT_LIGHT: {
             if (node->vertexArrayObjectID != -1) {
                 glUniform3fv(7, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].relative_position));
+
             }
             break;
         }
