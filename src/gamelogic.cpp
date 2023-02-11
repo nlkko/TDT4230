@@ -96,11 +96,11 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
     glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
 }
 
-//// A few lines to help you if you've never used c++ structs
+// A few lines to help you if you've never used c++ structs
 
 struct LightSource {
     SceneNode* node;
-    glm::vec3 relative_position;
+    glm::vec3 position;
     glm::vec3 color;
 };
 
@@ -130,18 +130,19 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     for (int i = 0; i < N_LIGHTS; i++) {
         // SceneNode Struct
         lightSources[i].node = createSceneNode();
-
         lightSources[i].node->vertexArrayObjectID = i;
         lightSources[i].node->nodeType = POINT_LIGHT;
-
-        // LightSource Struct
-        lightSources[i].color = glm::vec3(1, 1, 1);
     }
 
     // Light positions
-    lightSources[0].node->position = glm::vec3(70.0, 30.0, -30.0);
-    lightSources[1].node->position = glm::vec3(-70.0, 30.0, -30.0);
+    lightSources[0].node->position = glm::vec3(60.0, 15.0, -15.0);
+    lightSources[1].node->position = glm::vec3(-60.0, 15.0, -15.0);
     lightSources[2].node->position = glm::vec3(0.0, 10, 0.0);
+
+    // Light colors
+    lightSources[0].color = glm::vec3(1.0, 0.0, 0.0);
+    lightSources[1].color = glm::vec3(0.0, 1.0, 0.0);
+    lightSources[2].color = glm::vec3(0.0, 0.0, 1.0);
 
     // Fill buffers
     unsigned int ballVAO = generateBuffer(sphere);
@@ -392,7 +393,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
         case GEOMETRY: break;
         case POINT_LIGHT: {
             glm::vec4 origin = glm::vec4(0.0, 0.0, 0.0, 1.0);
-            lightSources[node->vertexArrayObjectID].relative_position = glm::vec3(node->currentTransformationMatrix * origin);
+            lightSources[node->vertexArrayObjectID].position = glm::vec3(node->currentTransformationMatrix * origin);
             break;
         }
 
@@ -430,12 +431,13 @@ void renderNode(SceneNode* node) {
             break;
         case POINT_LIGHT: {
             if (node->vertexArrayObjectID != -1) {
-                //glUniform3fv(7, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].relative_position));
+                //glUniform3fv(7, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].position));
 
-                glUniform3fv(7, 1, glm::value_ptr(lightSources[0].relative_position));
-                glUniform3fv(8, 1, glm::value_ptr(lightSources[1].relative_position));
-                glUniform3fv(9, 1, glm::value_ptr(lightSources[2].relative_position));
+                GLint location_position = shader->getUniformFromName(fmt::format("light_sources[{}].position", node->vertexArrayObjectID));
+                glUniform3fv(location_position, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].position));
 
+                GLint location_color = shader->getUniformFromName(fmt::format("light_sources[{}].color", node->vertexArrayObjectID));
+                glUniform3fv(location_color, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].color));
             }
             break;
         }
