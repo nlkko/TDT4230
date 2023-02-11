@@ -139,8 +139,9 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     }
 
     // Light positions
-    lightSources[0].node->position = glm::vec3(50.0, 20.0, 0.0);
-    lightSources[1].node->position = glm::vec3(-50.0, 20.0, 0.0);
+    lightSources[0].node->position = glm::vec3(70.0, 30.0, -30.0);
+    lightSources[1].node->position = glm::vec3(-70.0, 30.0, -30.0);
+    lightSources[2].node->position = glm::vec3(0.0, 10, 0.0);
 
     // Fill buffers
     unsigned int ballVAO = generateBuffer(sphere);
@@ -415,6 +416,10 @@ void renderNode(SceneNode* node) {
 
     // Camera Position
     glUniform3fv(10, 1, glm::value_ptr(cameraPosition));
+
+    // Ball Values
+    glUniform3fv(11, 1, glm::value_ptr(ballPosition));
+    glUniform1f(12, ballRadius);
 
     switch(node->nodeType) {
         case GEOMETRY:
