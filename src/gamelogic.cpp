@@ -103,7 +103,6 @@ struct LightSource {
 
 LightSource lightSources[N_LIGHTS];
 
-
 void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     buffer = new sf::SoundBuffer();
     if (!buffer->loadFromFile("../res/Hall of the Mountain King.ogg")) {
@@ -125,21 +124,20 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh sphere = generateSphere(1.0, 40, 40);
 
     // Create lights
-    for (int i = 0; i < N_LIGHTS; ++i) {
+    for (int i = 0; i < N_LIGHTS; i++) {
         // SceneNode Struct
         lightSources[i].node = createSceneNode();
 
-        // 100 + to avoid conflicts in the location
-        lightSources[i].node->vertexArrayObjectID = 100 + i;
+        lightSources[i].node->vertexArrayObjectID = i;
         lightSources[i].node->nodeType = POINT_LIGHT;
 
         // LightSource Struct
         lightSources[i].color = glm::vec3(1, 1, 1);
     }
 
-    // Randomized position for the first two stationary light sources
-    //lightSources[0].position = glm::vec3(rand() % 10, rand() % 10, rand() % 10);
-    //lightSources[1].position = glm::vec3(rand() % 10, rand() % 10, rand() % 10);
+    // Light positions
+    lightSources[0].relative_position = glm::vec3(0.0);
+    lightSources[1].relative_position = glm::vec3(10.0);
 
     // Fill buffers
     unsigned int ballVAO = generateBuffer(sphere);
@@ -156,7 +154,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     rootNode->children.push_back(padNode);
     rootNode->children.push_back(ballNode);
 
-    // Static Lights
+    // Stationary Lights
     boxNode->children.push_back(lightSources[0].node);
     boxNode->children.push_back(lightSources[1].node);
 
@@ -176,6 +174,9 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     std::cout << fmt::format("Initialized scene with {} SceneNodes.", totalChildren(rootNode)) << std::endl;
 
+    for (int i = 0; i < N_LIGHTS - 1; ++i) {
+        std::cout << fmt::format("Light #{} | Position: {}, {}, {}", i, lightSources[i].relative_position[0], lightSources[i].relative_position[0], lightSources[i].relative_position[0]) << std::endl;
+    }
 
     std::cout << "Ready. Click to start!" << std::endl;
 }
@@ -380,7 +381,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
     node->currentTransformationMatrix = transformationThusFar * transformationMatrix;
     node->MVP = VP * node->currentTransformationMatrix;
 
-    // Does this need to be normalised before sending? Ambiguous task text
+    // TODO: Does this need to be normalised before sending? Confusing task text
     node->normal = glm::mat3( transpose( inverse( node->currentTransformationMatrix ) ) );
 
     switch(node->nodeType) {
@@ -410,9 +411,6 @@ void renderNode(SceneNode* node) {
     // Normal
     glUniformMatrix3fv(5, 1, GL_FALSE, glm::value_ptr(node->normal));
 
-    // Number of active light sources
-    glUniform1i(6, N_LIGHTS);
-
     switch(node->nodeType) {
         case GEOMETRY:
             if(node->vertexArrayObjectID != -1) {
@@ -422,7 +420,7 @@ void renderNode(SceneNode* node) {
             break;
         case POINT_LIGHT: {
             if (node->vertexArrayObjectID != -1) {
-                glUniform3fv(node->vertexArrayObjectID, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].relative_position));
+                glUniform3fv(7, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].relative_position));
             }
             break;
         }
