@@ -40,15 +40,15 @@ void main()
 
     vec3 diffuse_intensity = vec3(0.0);
     vec3 specular_shine = vec3(0.0);
-    float attenuation = 0;
     vec3 light_color = vec3(0.0);
+    float attenuation = 0;
 
     for (int i = 0; i < N_LIGHTS; i++) {
         // Attenuation
-        float light_distance = length( light_sources[i].position - position);
-        attenuation = 1.0 / (constant + light_distance * linear + pow(light_distance, 2) * quadratic );
+        float light_distance = length( light_sources[i].position - position );
+        attenuation = 1.0 / (constant + light_distance * linear + pow( light_distance, 2) * quadratic );
 
-        // Phong lighting
+        // Lighting
         vec3 light_direction = normalize( light_sources[i].position - position );
         vec3 view_direction = normalize( camera_position - position );
         vec3 reflection_direction = reflect( -light_direction, normalized_normal );
@@ -56,12 +56,11 @@ void main()
         // Shadow
         vec3 ball_direction = ball_position - position;
         vec3 shadow_light_direction = light_sources[i].position - position;
-
         vec3 rejection = reject(ball_direction, shadow_light_direction);
 
         float rejection_value = float(
             // Should cast shadow when:
-            // Length of this rejection is bigger than the radius
+            // Length of rejection is bigger than the radius
             length(rejection) > ball_radius
             ||
             // Length of vector framgent -> light < fragment -> ball
@@ -71,6 +70,7 @@ void main()
             dot(ball_direction, shadow_light_direction) < 0
         );
 
+        // Add up calculations
         specular_shine += pow( max( dot( view_direction, reflection_direction ), 0.0 ), specular_factor) * attenuation * rejection_value * light_sources[i].color;
         diffuse_intensity += max( dot ( normalized_normal, light_direction ), 0.0) * attenuation * rejection_value * light_sources[i].color;
     }

@@ -128,7 +128,6 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // Create lights
     for (int i = 0; i < N_LIGHTS; i++) {
-        // SceneNode Struct
         lightSources[i].node = createSceneNode();
         lightSources[i].node->vertexArrayObjectID = i;
         lightSources[i].node->nodeType = POINT_LIGHT;
@@ -163,7 +162,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     boxNode->children.push_back(lightSources[0].node);
     boxNode->children.push_back(lightSources[1].node);
 
-    // Moving Lights
+    // Dynamic Lights
     ballNode->children.push_back(lightSources[2].node);
 
     boxNode->vertexArrayObjectID  = boxVAO;
@@ -369,7 +368,6 @@ void updateFrame(GLFWwindow* window) {
     };
 
     updateNodeTransformations(rootNode, glm::mat4(1.0f));
-
 }
 
 void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar) {
@@ -431,8 +429,6 @@ void renderNode(SceneNode* node) {
             break;
         case POINT_LIGHT: {
             if (node->vertexArrayObjectID != -1) {
-                //glUniform3fv(7, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].position));
-
                 GLint location_position = shader->getUniformFromName(fmt::format("light_sources[{}].position", node->vertexArrayObjectID));
                 glUniform3fv(location_position, 1, glm::value_ptr(lightSources[node->vertexArrayObjectID].position));
 
