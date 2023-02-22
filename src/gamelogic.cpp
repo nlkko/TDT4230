@@ -96,7 +96,27 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
     glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
 }
 
-// A few lines to help you if you've never used c++ structs
+
+int generateTexture(PNGImage image) {
+    // Reserving ID for texture
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    // Bind texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Load into GPU's VRAM
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.pixels.data());
+
+    // Generate mipmaps for texture
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // Address oversampling and undersampling
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    return textureID;
+}
 
 struct LightSource {
     SceneNode* node;
@@ -125,6 +145,10 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh pad = cube(padDimensions, glm::vec2(30, 40), true);
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
     Mesh sphere = generateSphere(1.0, 40, 40);
+
+    // Load textures
+    PNGImage charmap = loadPNGFile("../res/textures/charmap.png");
+
 
     // Create lights
     for (int i = 0; i < N_LIGHTS; i++) {
