@@ -75,7 +75,7 @@ void main()
         diffuse_intensity += max( dot ( normalized_normal, light_direction ), 0.0) * attenuation * rejection_value * light_sources[i].color;
     }
 
-    vec3 ambient = ambient_strength * light_color * attenuation;
+    vec3 ambient = ambient_strength * light_color;
     vec3 diffuse = diffuse_strength * diffuse_intensity;
     vec3 specular = specular_strength * specular_shine;
 

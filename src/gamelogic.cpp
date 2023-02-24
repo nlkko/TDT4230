@@ -37,6 +37,7 @@ SceneNode* rootNode;
 SceneNode* boxNode;
 SceneNode* ballNode;
 SceneNode* padNode;
+SceneNode* textNode;
 
 double ballRadius = 3.0f;
 
@@ -146,8 +147,18 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
     Mesh sphere = generateSphere(1.0, 40, 40);
 
-    // Load textures
-    PNGImage charmap = loadPNGFile("../res/textures/charmap.png");
+
+    // Text Texture
+    float char_width = 29.0;
+    float char_height = 39.0;
+    std::string displayed_text = "This text is generated from a texture";
+    float mesh_width = displayed_text.length() * char_width;
+
+    PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures
+    generateTexture(charmap); // Generate textures
+    Mesh text_mesh = generateTextGeometryBuffer(displayed_text, char_height / char_width, mesh_width); // Generate text
+
+    // Create text
 
 
     // Create lights
@@ -171,16 +182,22 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int ballVAO = generateBuffer(sphere);
     unsigned int boxVAO  = generateBuffer(box);
     unsigned int padVAO  = generateBuffer(pad);
+    unsigned int textVAO = generateBuffer(text_mesh);
 
     // Construct scene
     rootNode = createSceneNode();
     boxNode  = createSceneNode();
     padNode  = createSceneNode();
     ballNode = createSceneNode();
+    textNode = createSceneNode();
+
+    // NodeType
+    textNode->nodeType = GEOMETRY_2D;
 
     rootNode->children.push_back(boxNode);
     rootNode->children.push_back(padNode);
     rootNode->children.push_back(ballNode);
+    rootNode->children.push_back(textNode);
 
     // Stationary Lights
     boxNode->children.push_back(lightSources[0].node);
@@ -197,6 +214,11 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     ballNode->vertexArrayObjectID = ballVAO;
     ballNode->VAOIndexCount       = sphere.indices.size();
+
+    textNode->vertexArrayObjectID = textVAO;
+    textNode->VAOIndexCount = text_mesh.indices.size();
+
+
 
     getTimeDeltaSeconds();
 
@@ -420,6 +442,8 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
         }
 
         case SPOT_LIGHT: break;
+        case GEOMETRY_2D: break;
+        case NORMAL_MAPPED_GEOMETRY: break;
     }
 
     for(SceneNode* child : node->children) {
@@ -462,6 +486,8 @@ void renderNode(SceneNode* node) {
             break;
         }
         case SPOT_LIGHT: break;
+        case GEOMETRY_2D: break;
+        case NORMAL_MAPPED_GEOMETRY: break;
     }
 
     for(SceneNode* child : node->children) {
