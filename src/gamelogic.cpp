@@ -44,13 +44,13 @@ double ballRadius = 3.0f;
 glm::mat4 VP;
 
 const int N_LIGHTS = 3;
-int texture_id;
 
 glm::vec3 cameraPosition;
 
 // These are heap allocated, because they should not be initialised at the start of the program
 sf::SoundBuffer* buffer;
 Gloom::Shader* shader;
+Gloom::Shader* shader_2d;
 sf::Sound* sound;
 
 const glm::vec3 boxDimensions(180, 90, 90);
@@ -99,9 +99,9 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
 }
 
 
-int generateTexture(PNGImage *image) {
+unsigned int generateTexture(PNGImage *image) {
     // Reserving ID for texture
-    GLuint textureID;
+    unsigned int textureID;
     glGenTextures(1, &textureID);
 
     // Bind texture
@@ -129,6 +129,7 @@ struct LightSource {
 LightSource lightSources[N_LIGHTS];
 
 void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
+
     buffer = new sf::SoundBuffer();
     if (!buffer->loadFromFile("../res/Hall of the Mountain King.ogg")) {
         return;
@@ -141,7 +142,9 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     shader = new Gloom::Shader();
     shader->makeBasicShader("../res/shaders/simple.vert", "../res/shaders/simple.frag");
-    shader->activate();
+
+    shader_2d = new Gloom::Shader();
+    shader_2d->makeBasicShader("../res/shaders/simple2d.vert", "../res/shaders/simple2d.frag");
 
     // Create meshes
     Mesh pad = cube(padDimensions, glm::vec2(30, 40), true);
@@ -156,11 +159,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     float mesh_width = displayed_text.length() * char_width;
 
     PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures
-    texture_id = generateTexture(&charmap); // Generate textures
+    unsigned int texture_id = generateTexture(&charmap); // Generate textures
     Mesh text_mesh = generateTextGeometryBuffer(displayed_text, char_height / char_width, mesh_width); // Generate text
-
-    // Create text
-
 
     // Create lights
     for (int i = 0; i < N_LIGHTS; i++) {
@@ -435,7 +435,6 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
     node->currentTransformationMatrix = transformationThusFar * transformationMatrix;
     node->MVP = VP * node->currentTransformationMatrix;
 
-    // TODO: Does this need to be normalised before sending? Confusing task text
     node->normal = glm::mat3( transpose( inverse( node->currentTransformationMatrix ) ) );
 
     switch(node->nodeType) {
@@ -457,21 +456,25 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 }
 
 void renderNode(SceneNode* node) {
-    // M
-    glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(node->currentTransformationMatrix));
+    if (node->nodeType != GEOMETRY_2D) {
+        shader->activate();
 
-    // MVP
-    glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
+        // M
+        glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(node->currentTransformationMatrix));
 
-    // Normal
-    glUniformMatrix3fv(5, 1, GL_FALSE, glm::value_ptr(node->normal));
+        // MVP
+        glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
 
-    // Camera Position
-    glUniform3fv(10, 1, glm::value_ptr(cameraPosition));
+        // Normal
+        glUniformMatrix3fv(5, 1, GL_FALSE, glm::value_ptr(node->normal));
 
-    // Ball Values
-    glUniform3fv(11, 1, glm::value_ptr(ballPosition));
-    glUniform1f(12, ballRadius);
+        // Camera Position
+        glUniform3fv(10, 1, glm::value_ptr(cameraPosition));
+
+        // Ball Values
+        glUniform3fv(11, 1, glm::value_ptr(ballPosition));
+        glUniform1f(12, ballRadius);
+    }
 
     switch(node->nodeType) {
         case GEOMETRY:
@@ -491,7 +494,17 @@ void renderNode(SceneNode* node) {
             break;
         }
         case SPOT_LIGHT: break;
-        case GEOMETRY_2D: break;
+        case GEOMETRY_2D:{
+            shader_2d->activate();
+            if (node->vertexArrayObjectID != -1) {
+
+                glBindTextureUnit(0, node->texture_id);
+                glBindVertexArray(node->vertexArrayObjectID);
+                glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+            }
+
+            break;
+        };
         case NORMAL_MAPPED_GEOMETRY: break;
     }
 

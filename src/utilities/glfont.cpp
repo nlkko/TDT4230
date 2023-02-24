@@ -23,7 +23,7 @@ Mesh generateTextGeometryBuffer(std::string text, float characterHeightOverWidth
         float baseXCoordinate = float(i) * characterWidth;
 
         // Such that (texCoord.x ∗ texImageWidth) = desiredPixelCoord.x
-        float base_u_texture_coordinate = float(i) * u_stride;
+        float base_u_texture_coordinate = float(text.at(i)) * u_stride;
 
         // Some values are assigned the same value again - redundant or necessary?
 
