@@ -155,7 +155,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Text Texture
     float char_width = 29.0;
     float char_height = 39.0;
-    std::string displayed_text = "This text is generated from a texture";
+    std::string displayed_text = "Sir, This Is A Wendy's";
     float mesh_width = displayed_text.length() * char_width;
 
     PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures
@@ -222,8 +222,6 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     textNode->vertexArrayObjectID = textVAO;
     textNode->VAOIndexCount = text_mesh.indices.size();
-
-
 
     getTimeDeltaSeconds();
 
@@ -495,8 +493,11 @@ void renderNode(SceneNode* node) {
         }
         case SPOT_LIGHT: break;
         case GEOMETRY_2D:{
-            shader_2d->activate();
             if (node->vertexArrayObjectID != -1) {
+                shader_2d->activate();
+
+                glm::mat4 orthographic = glm::ortho(0.0f, float(windowWidth), 0.0f, float(windowHeight));
+                glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(orthographic));
 
                 glBindTextureUnit(0, node->texture_id);
                 glBindVertexArray(node->vertexArrayObjectID);
