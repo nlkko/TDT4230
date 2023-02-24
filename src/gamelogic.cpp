@@ -44,6 +44,7 @@ double ballRadius = 3.0f;
 glm::mat4 VP;
 
 const int N_LIGHTS = 3;
+int texture_id;
 
 glm::vec3 cameraPosition;
 
@@ -98,7 +99,7 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
 }
 
 
-int generateTexture(PNGImage image) {
+int generateTexture(PNGImage *image) {
     // Reserving ID for texture
     GLuint textureID;
     glGenTextures(1, &textureID);
@@ -107,7 +108,7 @@ int generateTexture(PNGImage image) {
     glBindTexture(GL_TEXTURE_2D, textureID);
 
     // Load into GPU's VRAM
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.pixels.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels.data());
 
     // Generate mipmaps for texture
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -155,7 +156,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     float mesh_width = displayed_text.length() * char_width;
 
     PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures
-    generateTexture(charmap); // Generate textures
+    texture_id = generateTexture(&charmap); // Generate textures
     Mesh text_mesh = generateTextGeometryBuffer(displayed_text, char_height / char_width, mesh_width); // Generate text
 
     // Create text
@@ -193,6 +194,10 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // NodeType
     textNode->nodeType = GEOMETRY_2D;
+
+    // Attributes
+    textNode->position = glm::vec3(0.0, 0.0, 0.0);
+    textNode->texture_id = texture_id;
 
     rootNode->children.push_back(boxNode);
     rootNode->children.push_back(padNode);

@@ -7,7 +7,7 @@ Mesh generateTextGeometryBuffer(std::string text, float characterHeightOverWidth
 
     // Normalised stride/width for u
     // Specify value between 0 and 1,
-    float u_stride = 1 / float(text.length());
+    float u_stride = 1.0 / 128.0;
 
     unsigned int vertexCount = 4 * text.length();
     unsigned int indexCount = 6 * text.length();
