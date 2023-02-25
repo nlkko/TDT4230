@@ -155,7 +155,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Text Texture
     float char_width = 29.0;
     float char_height = 39.0;
-    std::string displayed_text = "What the dog doing?";
+    std::string displayed_text = "UNSUSPICIOUS BASEMENT";
     float mesh_width = displayed_text.length() * char_width;
 
     PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures

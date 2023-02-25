@@ -3,6 +3,7 @@
 in layout(location = 0) vec3 normal;
 in layout(location = 1) vec2 textureCoordinates;
 in layout(location = 2) vec3 position;
+in layout(location = 3) mat3 TBN;
 
 struct LightSource {
     vec3 position;
@@ -14,14 +15,14 @@ uniform LightSource light_sources[N_LIGHTS];
 
 uniform layout(location = 10) vec3 camera_position;
 
-const float ambient_strength = 0.3;
+const float ambient_strength = 0.9;
 const float diffuse_strength = 0.8;
-const float specular_strength = 0.3;
-const int specular_factor = 16; // 2, 4, 8, 16, 32, 64, 128, 256
+const float specular_strength = 0.05;
+const int specular_factor = 2; // 2, 4, 8, 16, 32, 64, 128, 256
 
 // Attenuation
 const float constant = 0.001;
-const float linear = 0.001;
+const float linear = 0.0001;
 const float quadratic = 0.001;
 
 // Ball Values
@@ -46,7 +47,7 @@ void main()
     vec3 normalized_normal;
 
     if (normal_mapped_geometry) {
-        normalized_normal = vec3(texture(box_normal_map, textureCoordinates));
+        normalized_normal = TBN * (texture(box_normal_map, textureCoordinates).xyz * 2 - 1);
     } else {
         normalized_normal = normalize(normal);
     }
@@ -84,7 +85,7 @@ void main()
 
         vec3 texture_color;
         if (normal_mapped_geometry) {
-            texture_color = vec3(texture(box_texture, textureCoordinates));
+            texture_color = texture(box_texture, textureCoordinates).xyz;
         } else {
             texture_color = vec3(1.0);
         }

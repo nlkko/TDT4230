@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.11.25) (preloaded format=pdflatex 2023.2.11)  25 FEB 2023 20:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.11.25) (preloaded format=pdflatex 2023.2.11)  26 FEB 2023 00:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -326,17 +326,24 @@ been already used, duplicate ignored
 l.36 \clearpage
                 [1 <./images/task1k.png>] [2
 
-] [3
+]
+<images/task3f.png, id=38, 1029.8475pt x 598.48593pt>
+File: images/task3f.png Graphic file (type png)
+<use images/task3f.png>
+Package pdftex.def Info: images/task3f.png  used on input line 65.
+(pdftex.def)             Requested size: 360.0pt x 209.20837pt.
+ [3
 
-] (report.aux)
+ <./images/task3f.png>]
+(report.aux)
 Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: FC1DB442D3302BC6FA38EE21A539EE65;424.
  ) 
 Here is how much of TeX's memory you used:
- 9610 strings out of 475284
- 157879 string characters out of 2774105
+ 9619 strings out of 475284
+ 158038 string characters out of 2774105
  523600 words of memory out of 3000000
- 30972 multiletter control sequences out of 15000+600000
+ 30978 multiletter control sequences out of 15000+600000
  476139 words of font info for 43 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,6n,106p,391b,451s stack positions out of 10000i,1000n,20000p,200000b,80000s
@@ -345,9 +352,9 @@ Here is how much of TeX's memory you used:
 0\ecbx1440.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
 /dpi600\ecrm1200.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
 pen/ec/dpi600\ecrm1728.pk>
-Output written on report.pdf (4 pages, 1446159 bytes).
+Output written on report.pdf (4 pages, 2224247 bytes).
 PDF statistics:
- 176 PDF objects out of 1000 (max. 8388607)
- 13 named destinations out of 1000 (max. 500000)
- 30 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 179 PDF objects out of 1000 (max. 8388607)
+ 15 named destinations out of 1000 (max. 500000)
+ 35 words of extra memory for PDF output out of 10000 (max. 10000000)
 
