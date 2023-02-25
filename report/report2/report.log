@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.11.25) (preloaded format=pdflatex 2023.2.11)  25 FEB 2023 15:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.11.25) (preloaded format=pdflatex 2023.2.11)  25 FEB 2023 19:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -313,7 +313,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [1
 
 {C:/Users/Dorde/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-<images/task1k.png, id=14, 1029.8475pt x 598.48593pt>
+<images/task1k.png, id=22, 1029.8475pt x 598.48593pt>
 File: images/task1k.png Graphic file (type png)
 <use images/task1k.png>
 Package pdftex.def Info: images/task1k.png  used on input line 30.
@@ -324,26 +324,30 @@ been already used, duplicate ignored
 <to be read again> 
                    \relax 
 l.36 \clearpage
-                [1 <./images/task1k.png>] (report.aux)
+                [1 <./images/task1k.png>] [2
+
+] [3
+
+] (report.aux)
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: B352C829668BCFEE38DD9C99918C6B48;153.
+(rerunfilecheck)             Checksum: FC1DB442D3302BC6FA38EE21A539EE65;424.
  ) 
 Here is how much of TeX's memory you used:
- 9600 strings out of 475284
- 157795 string characters out of 2774105
- 519600 words of memory out of 3000000
- 30970 multiletter control sequences out of 15000+600000
+ 9610 strings out of 475284
+ 157879 string characters out of 2774105
+ 523600 words of memory out of 3000000
+ 30972 multiletter control sequences out of 15000+600000
  476139 words of font info for 43 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 108i,6n,106p,290b,451s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 108i,6n,106p,344b,451s stack positions out of 10000i,1000n,20000p,200000b,80000s
  <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm
 1095.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
 0\ecbx1440.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
 /dpi600\ecrm1200.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
 pen/ec/dpi600\ecrm1728.pk>
-Output written on report.pdf (2 pages, 1432385 bytes).
+Output written on report.pdf (4 pages, 1445634 bytes).
 PDF statistics:
- 125 PDF objects out of 1000 (max. 8388607)
- 5 named destinations out of 1000 (max. 500000)
- 14 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 175 PDF objects out of 1000 (max. 8388607)
+ 13 named destinations out of 1000 (max. 500000)
+ 30 words of extra memory for PDF output out of 10000 (max. 10000000)
 
