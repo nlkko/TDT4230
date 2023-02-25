@@ -28,15 +28,14 @@ Mesh generateTextGeometryBuffer(std::string text, float characterHeightOverWidth
         // Some values are assigned the same value again - redundant or necessary?
 
         // Triangle - 90 degrees vertex bottom right
-        mesh.vertices.at(4 * i + 0) = {baseXCoordinate, 0, 0}; // u_0
-        mesh.vertices.at(4 * i + 1) = {baseXCoordinate + characterWidth, 0, 0}; // u
-        mesh.vertices.at(4 * i + 2) = {baseXCoordinate + characterWidth, characterHeight, 0}; // v
+        mesh.vertices.at(4 * i + 0) = {baseXCoordinate, 0, 0}; // x_0
+        mesh.vertices.at(4 * i + 1) = {baseXCoordinate + characterWidth, 0, 0}; // x
+        mesh.vertices.at(4 * i + 2) = {baseXCoordinate + characterWidth, characterHeight, 0}; // y
 
         // Triangle - 90 degrees vertex top left
-        mesh.vertices.at(4 * i + 0) = {baseXCoordinate, 0, 0}; // u_0
-        mesh.vertices.at(4 * i + 2) = {baseXCoordinate + characterWidth, characterHeight, 0}; // v
-        mesh.vertices.at(4 * i + 3) = {baseXCoordinate, characterHeight, 0}; // u
-
+        mesh.vertices.at(4 * i + 0) = {baseXCoordinate, 0, 0}; // x_0
+        mesh.vertices.at(4 * i + 2) = {baseXCoordinate + characterWidth, characterHeight, 0}; // y
+        mesh.vertices.at(4 * i + 3) = {baseXCoordinate, characterHeight, 0}; // x
 
         mesh.indices.at(6 * i + 0) = 4 * i + 0;
         mesh.indices.at(6 * i + 1) = 4 * i + 1;

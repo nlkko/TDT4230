@@ -162,6 +162,13 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int texture_id = generateTexture(&charmap); // Generate textures
     Mesh text_mesh = generateTextGeometryBuffer(displayed_text, char_height / char_width, mesh_width); // Generate text
 
+    // Box Texture
+    PNGImage box_diffuse_image = loadPNGFile("../res/textures/Brick03_col.png");
+    PNGImage box_normal_image = loadPNGFile("../res/textures/Brick03_nrm.png");
+
+    unsigned int box_texture_id = generateTexture(&box_diffuse_image);
+    unsigned int box_normal_map_id = generateTexture(&box_normal_image);
+
     // Create lights
     for (int i = 0; i < N_LIGHTS; i++) {
         lightSources[i].node = createSceneNode();
@@ -177,7 +184,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Light colors
     lightSources[0].color = glm::vec3(1.0, 0.0, 0.0);
     lightSources[1].color = glm::vec3(0.0, 1.0, 0.0);
-    lightSources[2].color = glm::vec3(0.0, 0.0, 1.0);
+    lightSources[2].color = glm::vec3(1.0, 1.0, 1.0);
 
     // Fill buffers
     unsigned int ballVAO = generateBuffer(sphere);
@@ -194,19 +201,24 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // NodeType
     textNode->nodeType = GEOMETRY_2D;
+    boxNode->nodeType = NORMAL_MAPPED_GEOMETRY;
 
     // Attributes
     textNode->position = glm::vec3(0.0, 0.0, 0.0);
     textNode->texture_id = texture_id;
 
+    boxNode->texture_id = box_texture_id;
+    boxNode->normal_map_texture_id = box_normal_map_id;
+
+    // Push
     rootNode->children.push_back(boxNode);
     rootNode->children.push_back(padNode);
     rootNode->children.push_back(ballNode);
     rootNode->children.push_back(textNode);
 
     // Stationary Lights
-    boxNode->children.push_back(lightSources[0].node);
-    boxNode->children.push_back(lightSources[1].node);
+    //boxNode->children.push_back(lightSources[0].node);
+    //boxNode->children.push_back(lightSources[1].node);
 
     // Dynamic Lights
     ballNode->children.push_back(lightSources[2].node);

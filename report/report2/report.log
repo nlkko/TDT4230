@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.11.25) (preloaded format=pdflatex 2023.2.11)  25 FEB 2023 19:58
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.11.25) (preloaded format=pdflatex 2023.2.11)  25 FEB 2023 20:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -339,15 +339,15 @@ Here is how much of TeX's memory you used:
  30972 multiletter control sequences out of 15000+600000
  476139 words of font info for 43 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 108i,6n,106p,344b,451s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 108i,6n,106p,391b,451s stack positions out of 10000i,1000n,20000p,200000b,80000s
  <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm
 1095.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
 0\ecbx1440.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
 /dpi600\ecrm1200.pk> <C:\Users\Dorde\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
 pen/ec/dpi600\ecrm1728.pk>
-Output written on report.pdf (4 pages, 1445634 bytes).
+Output written on report.pdf (4 pages, 1446159 bytes).
 PDF statistics:
- 175 PDF objects out of 1000 (max. 8388607)
+ 176 PDF objects out of 1000 (max. 8388607)
  13 named destinations out of 1000 (max. 500000)
  30 words of extra memory for PDF output out of 10000 (max. 10000000)
 
