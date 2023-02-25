@@ -28,6 +28,13 @@ const float quadratic = 0.001;
 uniform layout(location = 11) vec3 ball_position;
 uniform layout(location = 12) float ball_radius;
 
+// Texture
+uniform layout(binding = 0) sampler2D box_texture;
+uniform layout(binding = 1) sampler2D box_normal_map;
+
+// Flag for normal mapped geometry
+uniform layout(location = 13) bool normal_mapped_geometry;
+
 out vec4 color;
 
 float rand(vec2 co) { return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
@@ -36,8 +43,13 @@ vec3 reject(vec3 from, vec3 onto) { return from - onto*dot(from, onto)/dot(onto,
 
 void main()
 {
-    vec3 normalized_normal = normalize(normal);
+    vec3 normalized_normal;
 
+    if (normal_mapped_geometry) {
+        normalized_normal = vec3(texture(box_normal_map, textureCoordinates));
+    } else {
+        normalized_normal = normalize(normal);
+    }
     vec3 diffuse_intensity = vec3(0.0);
     vec3 specular_shine = vec3(0.0);
     vec3 light_color = vec3(0.0);
@@ -70,9 +82,16 @@ void main()
             dot(ball_direction, shadow_light_direction) < 0
         );
 
+        vec3 texture_color;
+        if (normal_mapped_geometry) {
+            texture_color = vec3(texture(box_texture, textureCoordinates));
+        } else {
+            texture_color = vec3(1.0);
+        }
+
         // Add up calculations
         specular_shine += pow( max( dot( view_direction, reflection_direction ), 0.0 ), specular_factor) * attenuation * rejection_value * light_sources[i].color;
-        diffuse_intensity += max( dot ( normalized_normal, light_direction ), 0.0) * attenuation * rejection_value * light_sources[i].color;
+        diffuse_intensity += max( dot ( normalized_normal, light_direction ), 0.0) * attenuation * rejection_value * light_sources[i].color * texture_color;
     }
 
     vec3 ambient = ambient_strength * light_color;

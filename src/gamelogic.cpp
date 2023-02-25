@@ -486,6 +486,11 @@ void renderNode(SceneNode* node) {
         glUniform1f(12, ballRadius);
     }
 
+    if (node->nodeType != NORMAL_MAPPED_GEOMETRY) {
+        // Flag for normal mapping feature
+        glUniform1i(13, GL_FALSE);
+    }
+
     switch(node->nodeType) {
         case GEOMETRY:
             if(node->vertexArrayObjectID != -1) {
@@ -518,7 +523,18 @@ void renderNode(SceneNode* node) {
 
             break;
         };
-        case NORMAL_MAPPED_GEOMETRY: break;
+        case NORMAL_MAPPED_GEOMETRY: {
+            // Flag for normal mapping feature
+            glUniform1i(13, GL_TRUE);
+
+            // Binding textures
+            glBindTextureUnit(0, node->texture_id);
+            glBindTextureUnit(1, node->normal_map_texture_id);
+
+
+            glBindVertexArray(node->vertexArrayObjectID);
+            glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+        };
     }
 
     for(SceneNode* child : node->children) {
