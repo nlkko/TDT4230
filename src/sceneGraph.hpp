@@ -13,7 +13,7 @@
 #include <chrono>
 #include <fstream>
 
-// enum cant start with number :(
+// enum can't start with number :(
 enum SceneNodeType {
 	GEOMETRY, POINT_LIGHT, SPOT_LIGHT, GEOMETRY_2D, NORMAL_MAPPED_GEOMETRY
 };

@@ -155,7 +155,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Text Texture
     float char_width = 29.0;
     float char_height = 39.0;
-    std::string displayed_text = "UNSUSPICIOUS BASEMENT";
+    std::string displayed_text = "Realistic breakout clone";
     float mesh_width = displayed_text.length() * char_width;
 
     PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures
@@ -203,7 +203,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     textNode->nodeType = GEOMETRY_2D;
     boxNode->nodeType = NORMAL_MAPPED_GEOMETRY;
 
-    // Attributes
+    // Properties
     textNode->position = glm::vec3(0.0, 0.0, 0.0);
     textNode->texture_id = texture_id;
 
@@ -217,8 +217,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     rootNode->children.push_back(textNode);
 
     // Stationary Lights
-    //boxNode->children.push_back(lightSources[0].node);
-    //boxNode->children.push_back(lightSources[1].node);
+    boxNode->children.push_back(lightSources[0].node);
+    boxNode->children.push_back(lightSources[1].node);
 
     // Dynamic Lights
     ballNode->children.push_back(lightSources[2].node);
@@ -513,10 +513,12 @@ void renderNode(SceneNode* node) {
             if (node->vertexArrayObjectID != -1) {
                 shader_2d->activate();
 
-                glm::mat4 orthographic = glm::ortho(0.0f, float(windowWidth), 0.0f, float(windowHeight));
-                glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(orthographic));
+                // Orthographic projection
+                glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(glm::ortho(0.0f, float(windowWidth), 0.0f, float(windowHeight))));
 
+                // Binding texture
                 glBindTextureUnit(0, node->texture_id);
+
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
             }
@@ -530,7 +532,6 @@ void renderNode(SceneNode* node) {
             // Binding textures
             glBindTextureUnit(0, node->texture_id);
             glBindTextureUnit(1, node->normal_map_texture_id);
-
 
             glBindVertexArray(node->vertexArrayObjectID);
             glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
