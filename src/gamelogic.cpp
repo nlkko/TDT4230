@@ -27,19 +27,17 @@ enum KeyFrameAction {
 
 #include <timestamps.h>
 
-double padPositionX = 0;
-double padPositionZ = 0;
+double viewpointX = 0;
+double viewpointZ = 0;
 
 unsigned int currentKeyFrame = 0;
 unsigned int previousKeyFrame = 0;
 
 SceneNode* rootNode;
 SceneNode* boxNode;
-SceneNode* ballNode;
 SceneNode* padNode;
 SceneNode* textNode;
-
-double ballRadius = 3.0f;
+SceneNode* coastNode;
 
 glm::mat4 VP;
 
@@ -55,9 +53,6 @@ sf::Sound* sound;
 
 const glm::vec3 boxDimensions(180, 90, 90);
 const glm::vec3 padDimensions(30, 3, 40);
-
-glm::vec3 ballPosition(0, ballRadius + padDimensions.y, boxDimensions.z / 2);
-glm::vec3 ballDirection(1, 1, 0.2f);
 
 CommandLineOptions options;
 
@@ -87,13 +82,13 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
     double deltaX = x - lastMouseX;
     double deltaY = y - lastMouseY;
 
-    padPositionX -= mouseSensitivity * deltaX / windowWidth;
-    padPositionZ -= mouseSensitivity * deltaY / windowHeight;
+    viewpointX -= mouseSensitivity * deltaX / windowWidth;
+    viewpointZ -= mouseSensitivity * deltaY / windowHeight;
 
-    if (padPositionX > 1) padPositionX = 1;
-    if (padPositionX < 0) padPositionX = 0;
-    if (padPositionZ > 1) padPositionZ = 1;
-    if (padPositionZ < 0) padPositionZ = 0;
+    if (viewpointX > 1) viewpointX = 1;
+    if (viewpointX < 0) viewpointX = 0;
+    if (viewpointZ > 1) viewpointZ = 1;
+    if (viewpointZ < 0) viewpointZ = 0;
 
     glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
 }
@@ -147,15 +142,15 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     shader_2d->makeBasicShader("../res/shaders/simple2d.vert", "../res/shaders/simple2d.frag");
 
     // Create meshes
+    Mesh testCube = cube(glm::vec3(20, 20, 20), glm::vec2(40, 40), true);
     Mesh pad = cube(padDimensions, glm::vec2(30, 40), true);
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
-    Mesh sphere = generateSphere(1.0, 40, 40);
 
 
     // Text Texture
     float char_width = 29.0;
     float char_height = 39.0;
-    std::string displayed_text = "Realistic breakout clone";
+    std::string displayed_text = "A";
     float mesh_width = displayed_text.length() * char_width;
 
     PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures
@@ -179,7 +174,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Light positions
     lightSources[0].node->position = glm::vec3(60.0, 15.0, -15.0);
     lightSources[1].node->position = glm::vec3(-60.0, 15.0, -15.0);
-    lightSources[2].node->position = glm::vec3(0.0, 10, 0.0);
+    lightSources[2].node->position = glm::vec3(0.0, 40, 0.0);
 
     // Light colors
     lightSources[0].color = glm::vec3(1.0, 0.0, 0.0);
@@ -187,16 +182,16 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     lightSources[2].color = glm::vec3(1.0, 1.0, 1.0);
 
     // Fill buffers
-    unsigned int ballVAO = generateBuffer(sphere);
     unsigned int boxVAO  = generateBuffer(box);
     unsigned int padVAO  = generateBuffer(pad);
     unsigned int textVAO = generateBuffer(text_mesh);
+    unsigned int testCubeVAO = generateBuffer(testCube);
 
     // Construct scene
     rootNode = createSceneNode();
+    coastNode = createSceneNode();
     boxNode  = createSceneNode();
     padNode  = createSceneNode();
-    ballNode = createSceneNode();
     textNode = createSceneNode();
 
     // NodeType
@@ -206,31 +201,34 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Properties
     textNode->position = glm::vec3(0.0, 0.0, 0.0);
     textNode->texture_id = texture_id;
+    coastNode->position = glm::vec3(0.0, -45.0, -100.0);
 
     boxNode->texture_id = box_texture_id;
     boxNode->normal_map_texture_id = box_normal_map_id;
 
     // Push
+    rootNode->children.push_back(coastNode);
+
     rootNode->children.push_back(boxNode);
     rootNode->children.push_back(padNode);
-    rootNode->children.push_back(ballNode);
     rootNode->children.push_back(textNode);
 
     // Stationary Lights
     boxNode->children.push_back(lightSources[0].node);
     boxNode->children.push_back(lightSources[1].node);
 
+
     // Dynamic Lights
-    ballNode->children.push_back(lightSources[2].node);
+    padNode->children.push_back(lightSources[2].node);
+
+    coastNode->vertexArrayObjectID = testCubeVAO;
+    coastNode->VAOIndexCount = testCube.indices.size();
 
     boxNode->vertexArrayObjectID  = boxVAO;
     boxNode->VAOIndexCount        = box.indices.size();
 
     padNode->vertexArrayObjectID  = padVAO;
     padNode->VAOIndexCount        = pad.indices.size();
-
-    ballNode->vertexArrayObjectID = ballVAO;
-    ballNode->VAOIndexCount       = sphere.indices.size();
 
     textNode->vertexArrayObjectID = textVAO;
     textNode->VAOIndexCount = text_mesh.indices.size();
@@ -251,17 +249,6 @@ void updateFrame(GLFWwindow* window) {
 
     double timeDelta = getTimeDeltaSeconds();
 
-    const float ballBottomY = boxNode->position.y - (boxDimensions.y/2) + ballRadius + padDimensions.y;
-    const float ballTopY    = boxNode->position.y + (boxDimensions.y/2) - ballRadius;
-    const float BallVerticalTravelDistance = ballTopY - ballBottomY;
-
-    const float cameraWallOffset = 30; // Arbitrary addition to prevent ball from going too much into camera
-
-    const float ballMinX = boxNode->position.x - (boxDimensions.x/2) + ballRadius;
-    const float ballMaxX = boxNode->position.x + (boxDimensions.x/2) - ballRadius;
-    const float ballMinZ = boxNode->position.z - (boxDimensions.z/2) + ballRadius;
-    const float ballMaxZ = boxNode->position.z + (boxDimensions.z/2) - ballRadius - cameraWallOffset;
-
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
         mouseLeftPressed = true;
         mouseLeftReleased = false;
@@ -277,155 +264,31 @@ void updateFrame(GLFWwindow* window) {
         mouseRightPressed = false;
     }
 
-    if(!hasStarted) {
-        if (mouseLeftPressed) {
-            if (options.enableMusic) {
-                sound = new sf::Sound();
-                sound->setBuffer(*buffer);
-                sf::Time startTime = sf::seconds(debug_startTime);
-                sound->setPlayingOffset(startTime);
-                sound->play();
-            }
-            totalElapsedTime = debug_startTime;
-            gameElapsedTime = debug_startTime;
-            hasStarted = true;
-        }
-
-        ballPosition.x = ballMinX + (1 - padPositionX) * (ballMaxX - ballMinX);
-        ballPosition.y = ballBottomY;
-        ballPosition.z = ballMinZ + (1 - padPositionZ) * ((ballMaxZ+cameraWallOffset) - ballMinZ);
-    } else {
-        totalElapsedTime += timeDelta;
-        if(hasLost) {
-            if (mouseLeftReleased) {
-                hasLost = false;
-                hasStarted = false;
-                currentKeyFrame = 0;
-                previousKeyFrame = 0;
-            }
-        } else if (isPaused) {
-            if (mouseRightReleased) {
-                isPaused = false;
-                if (options.enableMusic) {
-                    sound->play();
-                }
-            }
-        } else {
-            gameElapsedTime += timeDelta;
-            if (mouseRightReleased) {
-                isPaused = true;
-                if (options.enableMusic) {
-                    sound->pause();
-                }
-            }
-            // Get the timing for the beat of the song
-            for (unsigned int i = currentKeyFrame; i < keyFrameTimeStamps.size(); i++) {
-                if (gameElapsedTime < keyFrameTimeStamps.at(i)) {
-                    continue;
-                }
-                currentKeyFrame = i;
-            }
-
-            jumpedToNextFrame = currentKeyFrame != previousKeyFrame;
-            previousKeyFrame = currentKeyFrame;
-
-            double frameStart = keyFrameTimeStamps.at(currentKeyFrame);
-            double frameEnd = keyFrameTimeStamps.at(currentKeyFrame + 1); // Assumes last keyframe at infinity
-
-            double elapsedTimeInFrame = gameElapsedTime - frameStart;
-            double frameDuration = frameEnd - frameStart;
-            double fractionFrameComplete = elapsedTimeInFrame / frameDuration;
-
-            double ballYCoord;
-
-            KeyFrameAction currentOrigin = keyFrameDirections.at(currentKeyFrame);
-            KeyFrameAction currentDestination = keyFrameDirections.at(currentKeyFrame + 1);
-
-            // Synchronize ball with music
-            if (currentOrigin == BOTTOM && currentDestination == BOTTOM) {
-                ballYCoord = ballBottomY;
-            } else if (currentOrigin == TOP && currentDestination == TOP) {
-                ballYCoord = ballBottomY + BallVerticalTravelDistance;
-            } else if (currentDestination == BOTTOM) {
-                ballYCoord = ballBottomY + BallVerticalTravelDistance * (1 - fractionFrameComplete);
-            } else if (currentDestination == TOP) {
-                ballYCoord = ballBottomY + BallVerticalTravelDistance * fractionFrameComplete;
-            }
-
-            // Make ball move
-            const float ballSpeed = 60.0f;
-            ballPosition.x += timeDelta * ballSpeed * ballDirection.x;
-            ballPosition.y = ballYCoord;
-            ballPosition.z += timeDelta * ballSpeed * ballDirection.z;
-
-            // Make ball bounce
-            if (ballPosition.x < ballMinX) {
-                ballPosition.x = ballMinX;
-                ballDirection.x *= -1;
-            } else if (ballPosition.x > ballMaxX) {
-                ballPosition.x = ballMaxX;
-                ballDirection.x *= -1;
-            }
-            if (ballPosition.z < ballMinZ) {
-                ballPosition.z = ballMinZ;
-                ballDirection.z *= -1;
-            } else if (ballPosition.z > ballMaxZ) {
-                ballPosition.z = ballMaxZ;
-                ballDirection.z *= -1;
-            }
-
-            if(options.enableAutoplay) {
-                padPositionX = 1-(ballPosition.x - ballMinX) / (ballMaxX - ballMinX);
-                padPositionZ = 1-(ballPosition.z - ballMinZ) / ((ballMaxZ+cameraWallOffset) - ballMinZ);
-            }
-
-            // Check if the ball is hitting the pad when the ball is at the bottom.
-            // If not, you just lost the game! (hehe)
-            if (jumpedToNextFrame && currentOrigin == BOTTOM && currentDestination == TOP) {
-                double padLeftX  = boxNode->position.x - (boxDimensions.x/2) + (1 - padPositionX) * (boxDimensions.x - padDimensions.x);
-                double padRightX = padLeftX + padDimensions.x;
-                double padFrontZ = boxNode->position.z - (boxDimensions.z/2) + (1 - padPositionZ) * (boxDimensions.z - padDimensions.z);
-                double padBackZ  = padFrontZ + padDimensions.z;
-
-                if (   ballPosition.x < padLeftX
-                    || ballPosition.x > padRightX
-                    || ballPosition.z < padFrontZ
-                    || ballPosition.z > padBackZ
-                ) {
-                    hasLost = true;
-                    if (options.enableMusic) {
-                        sound->stop();
-                        delete sound;
-                    }
-                }
-            }
-        }
-    }
-
     glm::mat4 projection = glm::perspective(glm::radians(80.0f), float(windowWidth) / float(windowHeight), 0.1f, 350.f);
 
     cameraPosition = glm::vec3(0, 2, -20);
 
     // Some math to make the camera move in a nice way
-    float lookRotation = -0.6 / (1 + exp(-5 * (padPositionX-0.5))) + 0.3;
+    float lookRotation = -0.6 / (1 + exp(-5 * (viewpointX - 0.5))) + 0.3;
     glm::mat4 cameraTransform =
-                    glm::rotate(0.3f + 0.2f * float(-padPositionZ*padPositionZ), glm::vec3(1, 0, 0)) *
-                    glm::rotate(lookRotation, glm::vec3(0, 1, 0)) *
+            glm::rotate(0.3f + 0.2f * float(-viewpointZ * viewpointZ), glm::vec3(1, 0, 0)) *
+            glm::rotate(lookRotation, glm::vec3(0, 1, 0)) *
                     glm::translate(-cameraPosition);
 
     VP = projection * cameraTransform;
 
     // Move and rotate various SceneNodes
     boxNode->position = { 0, -10, -80 };
-
+    /*
     ballNode->position = ballPosition;
     ballNode->scale = glm::vec3(ballRadius);
     ballNode->rotation = { 0, totalElapsedTime*2, 0 };
+     */
 
     padNode->position  = {
-        boxNode->position.x - (boxDimensions.x/2) + (padDimensions.x/2) + (1 - padPositionX) * (boxDimensions.x - padDimensions.x),
+        boxNode->position.x - (boxDimensions.x/2) + (padDimensions.x/2) + (1 - viewpointX) * (boxDimensions.x - padDimensions.x),
         boxNode->position.y - (boxDimensions.y/2) + (padDimensions.y/2),
-        boxNode->position.z - (boxDimensions.z/2) + (padDimensions.z/2) + (1 - padPositionZ) * (boxDimensions.z - padDimensions.z)
+        boxNode->position.z - (boxDimensions.z/2) + (padDimensions.z/2) + (1 - viewpointZ) * (boxDimensions.z - padDimensions.z)
     };
 
     updateNodeTransformations(rootNode, glm::mat4(1.0f));
@@ -480,10 +343,6 @@ void renderNode(SceneNode* node) {
 
         // Camera Position
         glUniform3fv(10, 1, glm::value_ptr(cameraPosition));
-
-        // Ball Values
-        glUniform3fv(11, 1, glm::value_ptr(ballPosition));
-        glUniform1f(12, ballRadius);
     }
 
     if (node->nodeType != NORMAL_MAPPED_GEOMETRY) {
@@ -492,12 +351,15 @@ void renderNode(SceneNode* node) {
     }
 
     switch(node->nodeType) {
-        case GEOMETRY:
+
+        case GEOMETRY: {
             if(node->vertexArrayObjectID != -1) {
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
             }
             break;
+        }
+
         case POINT_LIGHT: {
             if (node->vertexArrayObjectID != -1) {
                 GLint location_position = shader->getUniformFromName(fmt::format("light_sources[{}].position", node->vertexArrayObjectID));
@@ -508,7 +370,9 @@ void renderNode(SceneNode* node) {
             }
             break;
         }
+
         case SPOT_LIGHT: break;
+
         case GEOMETRY_2D:{
             if (node->vertexArrayObjectID != -1) {
                 shader_2d->activate();
@@ -524,7 +388,8 @@ void renderNode(SceneNode* node) {
             }
 
             break;
-        };
+        }
+
         case NORMAL_MAPPED_GEOMETRY: {
             // Flag for normal mapping feature
             glUniform1i(13, GL_TRUE);
