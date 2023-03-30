@@ -20,6 +20,7 @@
 
 #include "utilities/imageLoader.hpp"
 #include "utilities/glfont.h"
+#include "utilities/textures.cpp"
 
 enum KeyFrameAction {
     BOTTOM, TOP
@@ -37,7 +38,9 @@ SceneNode* rootNode;
 SceneNode* boxNode;
 SceneNode* padNode;
 SceneNode* textNode;
+
 SceneNode* coastNode;
+SceneNode* skyboxNode;
 
 glm::mat4 VP;
 
@@ -49,17 +52,14 @@ glm::vec3 cameraPosition;
 sf::SoundBuffer* buffer;
 Gloom::Shader* shader;
 Gloom::Shader* shader_2d;
+Gloom::Shader* shader_skybox;
+
 sf::Sound* sound;
 
 const glm::vec3 boxDimensions(180, 90, 90);
 const glm::vec3 padDimensions(30, 3, 40);
 
 CommandLineOptions options;
-
-bool hasStarted        = false;
-bool hasLost           = false;
-bool jumpedToNextFrame = false;
-bool isPaused          = false;
 
 bool mouseLeftPressed   = false;
 bool mouseLeftReleased  = false;
@@ -93,28 +93,6 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
     glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
 }
 
-
-unsigned int generateTexture(PNGImage *image) {
-    // Reserving ID for texture
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    // Bind texture
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    // Load into GPU's VRAM
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels.data());
-
-    // Generate mipmaps for texture
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // Address oversampling and undersampling
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    return textureID;
-}
-
 struct LightSource {
     SceneNode* node;
     glm::vec3 position;
@@ -141,11 +119,16 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     shader_2d = new Gloom::Shader();
     shader_2d->makeBasicShader("../res/shaders/simple2d.vert", "../res/shaders/simple2d.frag");
 
+    shader_skybox = new Gloom::Shader();
+    shader_skybox->makeBasicShader("../res/shaders/simple_skybox.vert", "../res/shaders/simple_skybox.frag");
+
     // Create meshes
-    Mesh testCube = cube(glm::vec3(20, 20, 20), glm::vec2(40, 40), true);
+    Mesh testCube = cube(glm::vec3(50, 20, 20), glm::vec2(40, 40), true);
     Mesh pad = cube(padDimensions, glm::vec2(30, 40), true);
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
 
+    Mesh skybox = cube(glm::vec3(360, 360, 360), glm::vec2(90), true, true);
+    Mesh test = generatePlane(glm::vec2(3,3), glm::vec2(10, 10));
 
     // Text Texture
     float char_width = 29.0;
@@ -163,6 +146,17 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     unsigned int box_texture_id = generateTexture(&box_diffuse_image);
     unsigned int box_normal_map_id = generateTexture(&box_normal_image);
+
+    // Skybox
+    std::vector<PNGImage> faces;
+    faces.push_back(loadPNGFile("../res/textures/classic/right.png"));
+    faces.push_back(loadPNGFile("../res/textures/classic/left.png"));
+    faces.push_back(loadPNGFile("../res/textures/classic/top.png"));
+    faces.push_back(loadPNGFile("../res/textures/classic/bottom.png"));
+    faces.push_back(loadPNGFile("../res/textures/classic/back.png"));
+    faces.push_back(loadPNGFile("../res/textures/classic/front.png"));
+
+    unsigned int skybox_texture_id = generateCubemap(faces);
 
     // Create lights
     for (int i = 0; i < N_LIGHTS; i++) {
@@ -186,10 +180,13 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int padVAO  = generateBuffer(pad);
     unsigned int textVAO = generateBuffer(text_mesh);
     unsigned int testCubeVAO = generateBuffer(testCube);
+    unsigned int skyboxVAO = generateBuffer(skybox);
 
     // Construct scene
     rootNode = createSceneNode();
     coastNode = createSceneNode();
+    skyboxNode = createSceneNode();
+
     boxNode  = createSceneNode();
     padNode  = createSceneNode();
     textNode = createSceneNode();
@@ -197,19 +194,21 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // NodeType
     textNode->nodeType = GEOMETRY_2D;
     boxNode->nodeType = NORMAL_MAPPED_GEOMETRY;
+    skyboxNode->nodeType = SKYBOX;
 
     // Properties
-    textNode->position = glm::vec3(0.0, 0.0, 0.0);
+    //skyboxNode->texture_id = skybox_texture_id;
+
     textNode->texture_id = texture_id;
-    coastNode->position = glm::vec3(0.0, -45.0, -100.0);
 
     boxNode->texture_id = box_texture_id;
     boxNode->normal_map_texture_id = box_normal_map_id;
 
     // Push
     rootNode->children.push_back(coastNode);
+    rootNode->children.push_back(skyboxNode);
 
-    rootNode->children.push_back(boxNode);
+    //rootNode->children.push_back(boxNode);
     rootNode->children.push_back(padNode);
     rootNode->children.push_back(textNode);
 
@@ -221,17 +220,21 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Dynamic Lights
     padNode->children.push_back(lightSources[2].node);
 
-    coastNode->vertexArrayObjectID = testCubeVAO;
-    coastNode->VAOIndexCount = testCube.indices.size();
+    // VAO
+    skyboxNode->vertexArrayObjectID = skyboxVAO;
+    skyboxNode->VAOIndexCount       = skybox.indices.size();
 
-    boxNode->vertexArrayObjectID  = boxVAO;
-    boxNode->VAOIndexCount        = box.indices.size();
+    coastNode->vertexArrayObjectID  = testCubeVAO;
+    coastNode->VAOIndexCount        = testCube.indices.size();
 
-    padNode->vertexArrayObjectID  = padVAO;
-    padNode->VAOIndexCount        = pad.indices.size();
+    boxNode->vertexArrayObjectID    = boxVAO;
+    boxNode->VAOIndexCount          = box.indices.size();
 
-    textNode->vertexArrayObjectID = textVAO;
-    textNode->VAOIndexCount = text_mesh.indices.size();
+    padNode->vertexArrayObjectID    = padVAO;
+    padNode->VAOIndexCount          = pad.indices.size();
+
+    textNode->vertexArrayObjectID   = textVAO;
+    textNode->VAOIndexCount         = text_mesh.indices.size();
 
     getTimeDeltaSeconds();
 
@@ -273,12 +276,22 @@ void updateFrame(GLFWwindow* window) {
     glm::mat4 cameraTransform =
             glm::rotate(0.3f + 0.2f * float(-viewpointZ * viewpointZ), glm::vec3(1, 0, 0)) *
             glm::rotate(lookRotation, glm::vec3(0, 1, 0)) *
-                    glm::translate(-cameraPosition);
+            glm::translate(-cameraPosition);
+
+    /*
+     * unlocked view
+     glm::rotate(float(-viewpointZ), glm::vec3(1, 0, 0)) *
+     glm::rotate(float(-viewpointX), glm::vec3(0, 1, 0)) *
+     glm::translate(-cameraPosition);
+     */
 
     VP = projection * cameraTransform;
 
     // Move and rotate various SceneNodes
     boxNode->position = { 0, -10, -80 };
+    textNode->position = glm::vec3(0.0, 0.0, 0.0);
+    coastNode->position = glm::vec3(0.0, -45.0, -100.0);
+    //skyboxNode->position = glm::vec3(0.0, -45.0, -100.0);
     /*
     ballNode->position = ballPosition;
     ballNode->scale = glm::vec3(ballRadius);
@@ -321,6 +334,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
         case SPOT_LIGHT: break;
         case GEOMETRY_2D: break;
         case NORMAL_MAPPED_GEOMETRY: break;
+        case SKYBOX: break;
     }
 
     for(SceneNode* child : node->children) {
@@ -329,8 +343,8 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 }
 
 void renderNode(SceneNode* node) {
-    if (node->nodeType != GEOMETRY_2D) {
-        shader->activate();
+    if (node->nodeType != GEOMETRY_2D && node->nodeType != SKYBOX) {
+        //shader->activate();
 
         // M
         glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(node->currentTransformationMatrix));
@@ -345,7 +359,7 @@ void renderNode(SceneNode* node) {
         glUniform3fv(10, 1, glm::value_ptr(cameraPosition));
     }
 
-    if (node->nodeType != NORMAL_MAPPED_GEOMETRY) {
+    if (node->nodeType != NORMAL_MAPPED_GEOMETRY && node->nodeType != SKYBOX) {
         // Flag for normal mapping feature
         glUniform1i(13, GL_FALSE);
     }
@@ -373,6 +387,7 @@ void renderNode(SceneNode* node) {
 
         case SPOT_LIGHT: break;
 
+
         case GEOMETRY_2D:{
             if (node->vertexArrayObjectID != -1) {
                 shader_2d->activate();
@@ -390,17 +405,40 @@ void renderNode(SceneNode* node) {
             break;
         }
 
+
         case NORMAL_MAPPED_GEOMETRY: {
-            // Flag for normal mapping feature
-            glUniform1i(13, GL_TRUE);
+            if (node->vertexArrayObjectID != -1) {
+                // Flag for normal mapping feature
+                glUniform1i(13, GL_TRUE);
 
-            // Binding textures
-            glBindTextureUnit(0, node->texture_id);
-            glBindTextureUnit(1, node->normal_map_texture_id);
+                // Binding textures
+                glBindTextureUnit(0, node->texture_id);
+                glBindTextureUnit(1, node->normal_map_texture_id);
 
-            glBindVertexArray(node->vertexArrayObjectID);
-            glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
-        };
+                glBindVertexArray(node->vertexArrayObjectID);
+                glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+            }
+
+            break;
+        }
+
+
+        case SKYBOX: {
+            if (node->vertexArrayObjectID != -1) {
+                shader_skybox->activate();
+
+                // MVP
+                glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
+
+
+                // VP
+                //glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(VP));
+
+                //glBindTextureUnit(0, node->texture_id);
+            }
+
+            break;
+        }
     }
 
     for(SceneNode* child : node->children) {

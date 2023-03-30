@@ -25,13 +25,9 @@ const float constant = 0.001;
 const float linear = 0.0001;
 const float quadratic = 0.001;
 
-// Ball Values
-uniform layout(location = 11) vec3 ball_position;
-uniform layout(location = 12) float ball_radius;
-
 // Texture
-uniform layout(binding = 0) sampler2D box_texture;
-uniform layout(binding = 1) sampler2D box_normal_map;
+uniform layout(binding = 0) sampler2D geometry_texture;
+uniform layout(binding = 1) sampler2D geometry_normal_map;
 
 // Flag for normal mapped geometry
 uniform layout(location = 13) bool normal_mapped_geometry;
@@ -47,7 +43,7 @@ void main()
     vec3 normalized_normal;
 
     if (normal_mapped_geometry) {
-        normalized_normal = TBN * (texture(box_normal_map, textureCoordinates).xyz * 2 - 1);
+        normalized_normal = TBN * (texture(geometry_normal_map, textureCoordinates).xyz * 2 - 1);
     } else {
         normalized_normal = normalize(normal);
     }
@@ -66,33 +62,16 @@ void main()
         vec3 view_direction = normalize( camera_position - position );
         vec3 reflection_direction = reflect( -light_direction, normalized_normal );
 
-        // Shadow
-        vec3 ball_direction = ball_position - position;
-        vec3 shadow_light_direction = light_sources[i].position - position;
-        vec3 rejection = reject(ball_direction, shadow_light_direction);
-
-        float rejection_value = float(
-            // Should cast shadow when:
-            // Length of rejection is bigger than the radius
-            length(rejection) > ball_radius
-            ||
-            // Length of vector framgent -> light < fragment -> ball
-            length(shadow_light_direction) < length(ball_direction)
-            ||
-            // Dot product of fragment -> ball, fragment -> light source is < 0
-            dot(ball_direction, shadow_light_direction) < 0
-        );
-
         vec3 texture_color;
         if (normal_mapped_geometry) {
-            texture_color = texture(box_texture, textureCoordinates).xyz;
+            texture_color = texture(geometry_texture, textureCoordinates).xyz;
         } else {
             texture_color = vec3(1.0);
         }
 
         // Add up calculations
-        specular_shine += pow( max( dot( view_direction, reflection_direction ), 0.0 ), specular_factor) * attenuation * rejection_value * light_sources[i].color;
-        diffuse_intensity += max( dot ( normalized_normal, light_direction ), 0.0) * attenuation * rejection_value * light_sources[i].color * texture_color;
+        specular_shine += pow( max( dot( view_direction, reflection_direction ), 0.0 ), specular_factor) * attenuation * light_sources[i].color;
+        diffuse_intensity += max( dot ( normalized_normal, light_direction ), 0.0) * attenuation * light_sources[i].color * texture_color;
     }
 
     vec3 ambient = ambient_strength * light_color;

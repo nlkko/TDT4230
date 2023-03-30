@@ -5,6 +5,7 @@ in layout(location = 1) vec3 normal_in;
 in layout(location = 2) vec2 textureCoordinates_in;
 in layout(location = 14) vec3 tangent;
 in layout(location = 15) vec3 bitangent;
+in layout(location = 1) vec3 dasdsa;
 
 uniform layout(location = 3) mat4 M;
 uniform layout(location = 4) mat4 MVP;
