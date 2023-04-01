@@ -53,6 +53,7 @@ sf::SoundBuffer* buffer;
 Gloom::Shader* shader;
 Gloom::Shader* shader_2d;
 Gloom::Shader* shader_skybox;
+Gloom::Shader* shader_wave;
 
 sf::Sound* sound;
 
@@ -120,7 +121,10 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     shader_2d->makeBasicShader("../res/shaders/simple2d.vert", "../res/shaders/simple2d.frag");
 
     shader_skybox = new Gloom::Shader();
-    shader_skybox->makeBasicShader("../res/shaders/simple_skybox.vert", "../res/shaders/simple_skybox.frag");
+    shader_skybox->makeBasicShader("../res/shaders/skybox.vert", "../res/shaders/skybox.frag");
+
+    shader_wave = new Gloom::Shader();
+    shader_wave->makeBasicShader("../res/shaders/wave.vert", "../res/shaders/wave.frag");
 
     // Create meshes
     Mesh testCube = cube(glm::vec3(50, 20, 20), glm::vec2(40, 40), true);
@@ -148,7 +152,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int box_texture_id = generateTexture(&box_diffuse_image);
     unsigned int box_normal_map_id = generateTexture(&box_normal_image);
 
-    // Skybox
+    // Skybox Texture
     std::vector<PNGImage> faces;
     faces.push_back(loadPNGFile("../res/textures/dusk/right.png"));
     faces.push_back(loadPNGFile("../res/textures/dusk/left.png"));
@@ -182,7 +186,6 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     unsigned int skyboxVAO  = generateBuffer(skybox);
     unsigned int waveVAO    = generateBuffer(wave);
-    unsigned int triangleVAO = generateBuffer(triangle);
 
     // Construct scene
     rootNode     = createSceneNode();
@@ -197,6 +200,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     textNode    ->nodeType = GEOMETRY_2D;
     boxNode     ->nodeType = NORMAL_MAPPED_GEOMETRY;
     skyboxNode  ->nodeType = SKYBOX;
+    waveNode    ->nodeType = WAVE;
 
     // Properties
     skyboxNode  ->texture_id = generateCubemap(faces);
@@ -208,7 +212,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // Push
     rootNode    ->children.push_back(skyboxNode);
-    rootNode    ->children.push_back(waveNode);
+
 
     //rootNode->children.push_back(boxNode);
     rootNode    ->children.push_back(padNode);
@@ -217,6 +221,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Stationary Lights
     boxNode     ->children.push_back(lightSources[0].node);
     boxNode     ->children.push_back(lightSources[1].node);
+
+    rootNode    ->children.push_back(waveNode);
 
 
     // Dynamic Lights
@@ -250,6 +256,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 }
 
 void updateFrame(GLFWwindow* window) {
+    gameElapsedTime += getTimeDeltaSeconds();
+
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
@@ -339,6 +347,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
         case GEOMETRY_2D: break;
         case NORMAL_MAPPED_GEOMETRY: break;
         case SKYBOX: break;
+        case WAVE: break;
     }
 
     for(SceneNode* child : node->children) {
@@ -432,11 +441,8 @@ void renderNode(SceneNode* node) {
                 shader_skybox->activate();
                 glDepthMask(GL_FALSE);
 
-                // VP
-                glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(VP));
-
                 // MVP
-                glUniformMatrix4fv(5, 1, GL_FALSE, glm::value_ptr(node->MVP));
+                glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
 
                 // Skybox Texture
                 glBindTextureUnit(GL_TEXTURE_CUBE_MAP, node->texture_id);
@@ -444,6 +450,23 @@ void renderNode(SceneNode* node) {
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
                 glDepthMask(GL_TRUE);
+            }
+
+            break;
+        }
+
+        case WAVE: {
+            if (node->vertexArrayObjectID != -1) {
+                shader_wave->activate();
+
+                // MVP
+                glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
+
+                // Total Elapsed Time
+                glUniform1f(5, gameElapsedTime);
+
+                glBindVertexArray(node->vertexArrayObjectID);
+                glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
             }
 
             break;
