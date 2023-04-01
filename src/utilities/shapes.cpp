@@ -211,13 +211,22 @@ Mesh generatePlane(int tesselation, glm::vec2 size) {
     // Create vertices
     Mesh plane;
 
-    float row_stride = size.x / tesselation;
-    float col_stride = size.y / tesselation;
+    float row_stride = size.x / float(tesselation-1);
+    float col_stride = size.y / float(tesselation-1);
 
+    float row_uv_stride = 1 / float(tesselation-1);
+    float col_uv_stride = 1 / float(tesselation-1);
+
+    // Vertices:
     // The plane is in 3D, however given vector is 2D, which is why y is placed in the z-axis.
+
+    // UV:
+    // Texture goes from 0 to 1, essentially 1 /
     for (int row = 0; row < tesselation; ++row) {
         for (int col = 0; col < tesselation; ++col) {
-            plane.vertices.push_back(glm::vec3(row * row_stride, 0.0, col * col_stride));
+            plane.vertices.push_back(glm::vec3(col * col_stride, 0.0, row * row_stride));
+            plane.textureCoordinates.push_back(glm::vec2(row * row_uv_stride, col * col_uv_stride));
+            plane.normals.push_back(glm::vec3(0, 1, 0));
         }
     }
 
@@ -225,7 +234,6 @@ Mesh generatePlane(int tesselation, glm::vec2 size) {
     for (int row = 0; row < tesselation - 1; ++row) {
         for (int col = 0; col < tesselation - 1; ++col) {
             int i = (row*tesselation) + col;
-            std::cout << i << ' ';
 
             // Bottom Left Triangle
             plane.indices.push_back(i);
@@ -238,32 +246,73 @@ Mesh generatePlane(int tesselation, glm::vec2 size) {
             plane.indices.push_back(i + tesselation + 1);
         }
     }
-    std::cout << "\n";
 
+    // Debug
+    if (false) {
+        std::cout << "Vertices\n";
+        int count = 0;
+        for (auto vertex : plane.vertices) {
+            count++;
+            std::cout << vertex.x  << ' ' << vertex.z;
 
-    std::cout << "Vertices\n";
-    int count = 0;
-    for (auto vertex : plane.vertices) {
-        count++;
-        std::cout << vertex.x  << ' ' << vertex.z;
-
-        if (count%4==0) {
-            std::cout << '\n';
-        } else {
-            std::cout << " | ";
+            if (count%4==0) {
+                std::cout << '\n';
+            } else {
+                std::cout << " | ";
+            }
         }
-    }
 
-    count = 0;
-    std::cout << "Indices\n";
-    for (auto index : plane.indices) {
-        count++;
-        std::cout << index << ' ';
+        std::cout << "UV Coords\n";
+        count = 0;
+        for (auto vertex : plane.textureCoordinates) {
+            count++;
+            std::cout << vertex.x  << ' ' << vertex.y;
 
-        if (count%3==0) {
-            std::cout << '\n';
+            if (count%4==0) {
+                std::cout << '\n';
+            } else {
+                std::cout << " | ";
+            }
+        }
+
+        count = 0;
+        std::cout << "Indices\n";
+        for (auto index : plane.indices) {
+            count++;
+            std::cout << index << ' ';
+
+            if (count%3==0) {
+                std::cout << '\n';
+            }
         }
     }
 
     return plane;
+}
+
+Mesh generateTestTriangle() {
+    Mesh triangle;
+
+    int scale = 5;
+
+    triangle.textureCoordinates.push_back(glm::vec2(0,0));
+    triangle.textureCoordinates.push_back(glm::vec2(0,1));
+    triangle.textureCoordinates.push_back(glm::vec2(1,0));
+    triangle.textureCoordinates.push_back(glm::vec2(1,1));
+
+    triangle.normals.push_back(glm::vec3(0, -1, 0));
+
+    triangle.vertices.push_back(glm::vec3(0.5 * scale, 0.5 * scale, 0.0));
+    triangle.vertices.push_back(glm::vec3(0.5 * scale, -0.5 * scale, 0.0));
+    triangle.vertices.push_back(glm::vec3(-0.5 * scale, -0.5 * scale, 0.0));
+    triangle.vertices.push_back(glm::vec3(-0.5 * scale, 0.5 * scale, 0.0));
+
+    triangle.indices.push_back(0);
+    triangle.indices.push_back(1);
+    triangle.indices.push_back(3);
+    triangle.indices.push_back(1);
+    triangle.indices.push_back(2);
+    triangle.indices.push_back(3);
+
+    return triangle;
 }

@@ -39,7 +39,7 @@ SceneNode* boxNode;
 SceneNode* padNode;
 SceneNode* textNode;
 
-SceneNode* coastNode;
+SceneNode* waveNode;
 SceneNode* skyboxNode;
 
 glm::mat4 VP;
@@ -128,7 +128,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
 
     Mesh skybox = cube(glm::vec3(360, 360, 360), glm::vec2(90), true, true);
-    Mesh test = generatePlane(4, glm::vec2(40, 40));
+    Mesh wave = generatePlane(100, glm::vec2(50, 100));
+    Mesh triangle = generateTestTriangle();
 
     // Text Texture
     float char_width = 29.0;
@@ -178,12 +179,15 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int padVAO  = generateBuffer(pad);
     unsigned int textVAO = generateBuffer(text_mesh);
     unsigned int testCubeVAO = generateBuffer(testCube);
-    unsigned int skyboxVAO = generateBuffer(skybox);
+
+    unsigned int skyboxVAO  = generateBuffer(skybox);
+    unsigned int waveVAO    = generateBuffer(wave);
+    unsigned int triangleVAO = generateBuffer(triangle);
 
     // Construct scene
-    rootNode = createSceneNode();
-    coastNode = createSceneNode();
-    skyboxNode = createSceneNode();
+    rootNode     = createSceneNode();
+    skyboxNode   = createSceneNode();
+    waveNode     = createSceneNode();
 
     boxNode  = createSceneNode();
     padNode  = createSceneNode();
@@ -199,31 +203,31 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     textNode    ->texture_id = texture_id;
 
-    boxNode->texture_id = box_texture_id;
-    boxNode->normal_map_texture_id = box_normal_map_id;
+    boxNode     ->texture_id = box_texture_id;
+    boxNode     ->normal_map_texture_id = box_normal_map_id;
 
     // Push
-    rootNode->children.push_back(skyboxNode);
-    rootNode->children.push_back(coastNode);
+    rootNode    ->children.push_back(skyboxNode);
+    rootNode    ->children.push_back(waveNode);
 
     //rootNode->children.push_back(boxNode);
-    rootNode->children.push_back(padNode);
-    rootNode->children.push_back(textNode);
+    rootNode    ->children.push_back(padNode);
+    rootNode    ->children.push_back(textNode);
 
     // Stationary Lights
-    boxNode->children.push_back(lightSources[0].node);
-    boxNode->children.push_back(lightSources[1].node);
+    boxNode     ->children.push_back(lightSources[0].node);
+    boxNode     ->children.push_back(lightSources[1].node);
 
 
     // Dynamic Lights
-    padNode->children.push_back(lightSources[2].node);
+    padNode     ->children.push_back(lightSources[2].node);
 
     // VAO
     skyboxNode->vertexArrayObjectID = skyboxVAO;
     skyboxNode->VAOIndexCount       = skybox.indices.size();
 
-    coastNode->vertexArrayObjectID  = testCubeVAO;
-    coastNode->VAOIndexCount        = testCube.indices.size();
+    waveNode->vertexArrayObjectID  = waveVAO;
+    waveNode->VAOIndexCount        = wave.indices.size();
 
     boxNode->vertexArrayObjectID    = boxVAO;
     boxNode->VAOIndexCount          = box.indices.size();
@@ -288,9 +292,9 @@ void updateFrame(GLFWwindow* window) {
     // Move and rotate various SceneNodes
     boxNode->position = { 0, -10, -80 };
     textNode->position = glm::vec3(0.0, 0.0, 0.0);
-    coastNode->position = glm::vec3(0.0, -45.0, -100.0);
+    waveNode->position = glm::vec3(0.0, -45.0, -130.0);
     skyboxNode->position = cameraPosition;
-    coastNode->rotation += glm::vec3(0, getTimeDeltaSeconds() / 10, 0);
+    //waveNode->rotation += glm::vec3(getTimeDeltaSeconds() / 2, 0, 0);
 
     /*
     ballNode->position = ballPosition;

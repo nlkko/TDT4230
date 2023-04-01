@@ -16,8 +16,8 @@ uniform LightSource light_sources[N_LIGHTS];
 uniform layout(location = 10) vec3 camera_position;
 
 const float ambient_strength = 0.9;
-const float diffuse_strength = 0.8;
-const float specular_strength = 0.05;
+const float diffuse_strength = 0.6;
+const float specular_strength = 0.7;
 const int specular_factor = 2; // 2, 4, 8, 16, 32, 64, 128, 256
 
 // Attenuation
