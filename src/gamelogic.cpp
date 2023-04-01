@@ -149,14 +149,12 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // Skybox
     std::vector<PNGImage> faces;
-    faces.push_back(loadPNGFile("../res/textures/classic/right.png"));
-    faces.push_back(loadPNGFile("../res/textures/classic/left.png"));
-    faces.push_back(loadPNGFile("../res/textures/classic/top.png"));
-    faces.push_back(loadPNGFile("../res/textures/classic/bottom.png"));
-    faces.push_back(loadPNGFile("../res/textures/classic/back.png"));
-    faces.push_back(loadPNGFile("../res/textures/classic/front.png"));
-
-    unsigned int skybox_texture_id = generateCubemap(faces);
+    faces.push_back(loadPNGFile("../res/textures/dusk/right.png"));
+    faces.push_back(loadPNGFile("../res/textures/dusk/left.png"));
+    faces.push_back(loadPNGFile("../res/textures/dusk/top.png"));
+    faces.push_back(loadPNGFile("../res/textures/dusk/bottom.png"));
+    faces.push_back(loadPNGFile("../res/textures/dusk/back.png"));
+    faces.push_back(loadPNGFile("../res/textures/dusk/front.png"));
 
     // Create lights
     for (int i = 0; i < N_LIGHTS; i++) {
@@ -192,14 +190,14 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     textNode = createSceneNode();
 
     // NodeType
-    textNode->nodeType = GEOMETRY_2D;
-    boxNode->nodeType = NORMAL_MAPPED_GEOMETRY;
-    skyboxNode->nodeType = SKYBOX;
+    textNode    ->nodeType = GEOMETRY_2D;
+    boxNode     ->nodeType = NORMAL_MAPPED_GEOMETRY;
+    skyboxNode  ->nodeType = SKYBOX;
 
     // Properties
-    //skyboxNode->texture_id = skybox_texture_id;
+    skyboxNode  ->texture_id = generateCubemap(faces);
 
-    textNode->texture_id = texture_id;
+    textNode    ->texture_id = texture_id;
 
     boxNode->texture_id = box_texture_id;
     boxNode->normal_map_texture_id = box_normal_map_id;
@@ -250,8 +248,6 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 void updateFrame(GLFWwindow* window) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    double timeDelta = getTimeDeltaSeconds();
-
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
         mouseLeftPressed = true;
         mouseLeftReleased = false;
@@ -270,6 +266,7 @@ void updateFrame(GLFWwindow* window) {
     glm::mat4 projection = glm::perspective(glm::radians(80.0f), float(windowWidth) / float(windowHeight), 0.1f, 350.f);
 
     cameraPosition = glm::vec3(0, 2, -20);
+    //cameraPosition += glm::vec3(1, 0, 0);
 
     // Some math to make the camera move in a nice way
     float lookRotation = -0.6 / (1 + exp(-5 * (viewpointX - 0.5))) + 0.3;
@@ -278,12 +275,13 @@ void updateFrame(GLFWwindow* window) {
             glm::rotate(lookRotation, glm::vec3(0, 1, 0)) *
             glm::translate(-cameraPosition);
 
+
     /*
-     * unlocked view
-     glm::rotate(float(-viewpointZ), glm::vec3(1, 0, 0)) *
+     // unlocked view
+     glm::mat4 cameraTransform = glm::rotate(float(-viewpointZ), glm::vec3(1, 0, 0)) *
      glm::rotate(float(-viewpointX), glm::vec3(0, 1, 0)) *
      glm::translate(-cameraPosition);
-     */
+    */
 
     VP = projection * cameraTransform;
 
@@ -291,7 +289,9 @@ void updateFrame(GLFWwindow* window) {
     boxNode->position = { 0, -10, -80 };
     textNode->position = glm::vec3(0.0, 0.0, 0.0);
     coastNode->position = glm::vec3(0.0, -45.0, -100.0);
-    //skyboxNode->position = glm::vec3(0.0, -45.0, -100.0);
+    skyboxNode->position = cameraPosition;
+    coastNode->rotation += glm::vec3(0, getTimeDeltaSeconds() / 10, 0);
+
     /*
     ballNode->position = ballPosition;
     ballNode->scale = glm::vec3(ballRadius);
@@ -425,18 +425,18 @@ void renderNode(SceneNode* node) {
 
         case SKYBOX: {
             if (node->vertexArrayObjectID != -1) {
-
                 shader_skybox->activate();
                 glDepthMask(GL_FALSE);
 
-                // MVP
-                glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
-
-
                 // VP
-                //glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(VP));
+                glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(VP));
 
-                //glBindTextureUnit(0, node->texture_id);
+                // MVP
+                glUniformMatrix4fv(5, 1, GL_FALSE, glm::value_ptr(node->MVP));
+
+                // Skybox Texture
+                glBindTextureUnit(GL_TEXTURE_CUBE_MAP, node->texture_id);
+
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
                 glDepthMask(GL_TRUE);

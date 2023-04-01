@@ -245,10 +245,12 @@ Mesh generatePlane(int tesselation, glm::vec2 size) {
     int count = 0;
     for (auto vertex : plane.vertices) {
         count++;
-        std::cout << vertex.x  << ' ' << vertex.z << " | ";
+        std::cout << vertex.x  << ' ' << vertex.z;
 
         if (count%4==0) {
             std::cout << '\n';
+        } else {
+            std::cout << " | ";
         }
     }
 
@@ -258,7 +260,7 @@ Mesh generatePlane(int tesselation, glm::vec2 size) {
         count++;
         std::cout << index << ' ';
 
-        if (count%4==0) {
+        if (count%3==0) {
             std::cout << '\n';
         }
     }
