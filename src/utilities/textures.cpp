@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <fmt/format.h>
-#include "utilities/imageLoader.hpp"
+#include "imageLoader.hpp"
+#include "textures.h"
 
 unsigned int generateTexture(PNGImage *image) {
     // Reserving ID for texture

@@ -206,50 +206,59 @@ Mesh generateSphere(float sphereRadius, int slices, int layers) {
     return mesh;
 }
 
-Mesh generatePlane(glm::vec2 tesselation, glm::vec2 size) {
+// Tesselation is how many tesselations in one side
+Mesh generatePlane(int tesselation, glm::vec2 size) {
     // Create vertices
     Mesh plane;
 
-    float row_stride = size.x / tesselation.x;
-    float col_stride = size.y / tesselation.y;
+    float row_stride = size.x / tesselation;
+    float col_stride = size.y / tesselation;
 
     // The plane is in 3D, however given vector is 2D, which is why y is placed in the z-axis.
-    for (int row = 0; row < tesselation.x; ++row) {
-        for (int col = 0; col < tesselation.y; ++col) {
+    for (int row = 0; row < tesselation; ++row) {
+        for (int col = 0; col < tesselation; ++col) {
             plane.vertices.push_back(glm::vec3(row * row_stride, 0.0, col * col_stride));
         }
     }
 
     // Create indices
-    for (int row = 0; row < tesselation.x; ++row) {
-        for (int col = 0; col < tesselation.y; ++col) {
-            int i = (row*tesselation.x) + row + col;
-            // Top Right Triangle
-            plane.indices.push_back(i);
-            plane.indices.push_back(i + tesselation.x + 1);
-            plane.indices.push_back(i + tesselation.x + 2);
+    for (int row = 0; row < tesselation - 1; ++row) {
+        for (int col = 0; col < tesselation - 1; ++col) {
+            int i = (row*tesselation) + col;
+            std::cout << i << ' ';
 
             // Bottom Left Triangle
             plane.indices.push_back(i);
-            plane.indices.push_back(i + tesselation.x + 2);
+            plane.indices.push_back(i + tesselation );
             plane.indices.push_back(i + 1);
+
+            // Top Left Triangle
+            plane.indices.push_back(i + 1);
+            plane.indices.push_back(i + tesselation);
+            plane.indices.push_back(i + tesselation + 1);
+        }
+    }
+    std::cout << "\n";
+
+
+    std::cout << "Vertices\n";
+    int count = 0;
+    for (auto vertex : plane.vertices) {
+        count++;
+        std::cout << vertex.x  << ' ' << vertex.z << " | ";
+
+        if (count%4==0) {
+            std::cout << '\n';
         }
     }
 
-    /*
-    std::cout << 'Vertices\n';
-    for (auto vertex : plane.vertices) {
-        std::cout << vertex.x  << ' ' << vertex.y << ' ' << vertex.z << '\n';
-    }
-    */
-
-    int count = 0;
+    count = 0;
     std::cout << "Indices\n";
     for (auto index : plane.indices) {
         count++;
         std::cout << index << ' ';
 
-        if (count%3==0) {
+        if (count%4==0) {
             std::cout << '\n';
         }
     }

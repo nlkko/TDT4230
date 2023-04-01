@@ -20,7 +20,7 @@
 
 #include "utilities/imageLoader.hpp"
 #include "utilities/glfont.h"
-#include "utilities/textures.cpp"
+#include "utilities/textures.h"
 
 enum KeyFrameAction {
     BOTTOM, TOP
@@ -128,7 +128,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
 
     Mesh skybox = cube(glm::vec3(360, 360, 360), glm::vec2(90), true, true);
-    Mesh test = generatePlane(glm::vec2(3,3), glm::vec2(10, 10));
+    Mesh test = generatePlane(4, glm::vec2(40, 40));
 
     // Text Texture
     float char_width = 29.0;
@@ -205,8 +205,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     boxNode->normal_map_texture_id = box_normal_map_id;
 
     // Push
-    rootNode->children.push_back(coastNode);
     rootNode->children.push_back(skyboxNode);
+    rootNode->children.push_back(coastNode);
 
     //rootNode->children.push_back(boxNode);
     rootNode->children.push_back(padNode);
@@ -344,7 +344,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 
 void renderNode(SceneNode* node) {
     if (node->nodeType != GEOMETRY_2D && node->nodeType != SKYBOX) {
-        //shader->activate();
+        shader->activate();
 
         // M
         glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(node->currentTransformationMatrix));
@@ -425,7 +425,9 @@ void renderNode(SceneNode* node) {
 
         case SKYBOX: {
             if (node->vertexArrayObjectID != -1) {
+
                 shader_skybox->activate();
+                glDepthMask(GL_FALSE);
 
                 // MVP
                 glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
@@ -435,6 +437,9 @@ void renderNode(SceneNode* node) {
                 //glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(VP));
 
                 //glBindTextureUnit(0, node->texture_id);
+                glBindVertexArray(node->vertexArrayObjectID);
+                glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+                glDepthMask(GL_TRUE);
             }
 
             break;
