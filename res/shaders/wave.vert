@@ -75,11 +75,18 @@ void main()
     wave_position += wave_function(wave3, position);
     wave_position -= (W_N - 1) * position;
 
+
+    vec3 wave_normal = normal_in;
+    wave_normal += wave_normal(wave1, normal_in);
+    wave_normal += wave_normal(wave2, normal_in);
+    wave_normal += wave_normal(wave3, normal_in);
+    wave_normal -= (W_N - 1) * normal_in;
+
     height_out = wave_position.y;
-    a_out = max(wave1.steepness, wave2.steepness);
+    a_out = max( max(wave1.steepness, wave2.steepness), wave3.steepness );
 
     // OUT
-    normal_out = normal_in;
+    normal_out = wave_normal;
     textureCoordinates_out = textureCoordinates_in;
     position_out = wave_position;
 
