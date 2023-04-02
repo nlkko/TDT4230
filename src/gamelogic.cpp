@@ -132,13 +132,13 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
 
     Mesh skybox = cube(glm::vec3(360, 360, 360), glm::vec2(90), true, true);
-    Mesh wave = generatePlane(100, glm::vec2(50, 100));
+    Mesh wave = generatePlane(200, glm::vec2(50, 100));
     Mesh triangle = generateTestTriangle();
 
     // Text Texture
     float char_width = 29.0;
     float char_height = 39.0;
-    std::string displayed_text = "A";
+    std::string displayed_text = "";
     float mesh_width = displayed_text.length() * char_width;
 
     PNGImage charmap = loadPNGFile("../res/textures/charmap.png"); // Load textures
@@ -215,7 +215,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
 
     //rootNode->children.push_back(boxNode);
-    rootNode    ->children.push_back(padNode);
+    //rootNode    ->children.push_back(padNode);
     rootNode    ->children.push_back(textNode);
 
     // Stationary Lights
@@ -298,9 +298,10 @@ void updateFrame(GLFWwindow* window) {
     VP = projection * cameraTransform;
 
     // Move and rotate various SceneNodes
-    boxNode->position = { 0, -10, -80 };
-    textNode->position = glm::vec3(0.0, 0.0, 0.0);
-    waveNode->position = glm::vec3(0.0, -45.0, -130.0);
+    boxNode->position    = { 0, -10, -80 };
+    textNode->position   = glm::vec3(0.0, 0.0, 0.0);
+    waveNode->position   = glm::vec3(-60.0, -45.0, -180.0);
+    waveNode->scale      = glm::vec3(2);
     skyboxNode->position = cameraPosition;
     //waveNode->rotation += glm::vec3(getTimeDeltaSeconds() / 2, 0, 0);
 
