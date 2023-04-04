@@ -7,23 +7,30 @@ in layout(location = 2) vec3 position;
 in layout(location = 3) float height;
 in layout(location = 4) float amplitude;
 
-uniform layout(binding = 0) sampler2D tex_noise1;
-uniform layout(binding = 1) sampler2D tex_noise2;
+uniform layout(binding = 0) sampler2D noise;
+
+uniform vec3 sun_direction = vec3(0, 1, 0.0);
 
 uniform layout(location = 5) float time;
 
+#define PI 3.1415926538
+
 // Colors for gradient
-uniform vec3 start_color = normalize(vec3(87, 105, 187));
-uniform vec3 end_color = vec3(0.772, 1.0, 0.952);
+uniform vec3 start_color = normalize(vec3(52, 77, 191));
+uniform vec3 end_color = normalize(vec3(78, 108, 245));
+
+//vec3(87, 105, 187)
+//vec3(0.772, 1.0, 0.952);
 uniform float i = 0.05; // intensity
 uniform float min_threshold = 0.699;
 uniform float max_threshold = 0.7;
+uniform float texture_scale = 3;
 
 vec3 gradient(vec3 start_color, vec3 end_color, float value) {
     return vec3(
-        start_color.x + (end_color.x - start_color.x) * value * i,
-        start_color.y + (end_color.y - start_color.y) * value * i,
-        start_color.z + (end_color.z - start_color.z) * value * i
+        start_color.x + (end_color.x - start_color.x) * value,
+        start_color.y + (end_color.y - start_color.y) * value,
+        start_color.z + (end_color.z - start_color.z) * value
     );
 }
 
@@ -33,18 +40,25 @@ void main()
 {
     float scale = height / amplitude;
 
-    vec3 n1 = texture2D(tex_noise1, vec2(textureCoordinates.x, textureCoordinates.y + time / 10)).xyz;
-    vec3 n2 = texture2D(tex_noise2, vec2(textureCoordinates.x + time/20, textureCoordinates.y)).xyz;
+    vec4 d1 = texture2D(noise, vec2(textureCoordinates.x, textureCoordinates.y + time/100) * texture_scale);
+    vec4 d2 = texture2D(noise, vec2(textureCoordinates.x - time/100, textureCoordinates.y) * texture_scale);
 
-    vec3 n = n1 + n2;
+    vec4 d_mix = mix(d1, d2, 0.5);
 
-    // sqrt( pow(n2.x - n1.x, 2) + pow(n2.y - n1.y, 2) + pow(n2.z - n1.z, 2))
-
-    float dist = 1 - sqrt( pow(n2.x - n1.x, 2) + pow(n2.y - n1.y, 2) + pow(n2.z - n1.z, 2));
-
-    if( dist > min_threshold && dist < max_threshold) {
+    if (d_mix.z > 0.3 && d_mix.x < 0.3 && d_mix.y < 0.4) {
         color = vec4(1.0, 1.0, 1.0, 0.8);
-    } else color = vec4(gradient(start_color, end_color, scale), 0.8);
+    } else {
+
+        //float foam_level = 1 - (textureCoordinates.y / 0.05);
+        float foam_level = pow(5, -25 * textureCoordinates.y);
+        float foam_osc = sin(time/5);
+
+        if (textureCoordinates.y < 0.15) color = vec4(gradient(start_color, end_color, scale) + vec3(1.0) * foam_level * abs(foam_osc), 0.8);
+        else color = vec4(gradient(start_color, end_color, scale), 0.8);
+
+
+    }
+
 
 
 }

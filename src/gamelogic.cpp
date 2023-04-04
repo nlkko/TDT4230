@@ -148,11 +148,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh text_mesh = generateTextGeometryBuffer(displayed_text, char_height / char_width, mesh_width); // Generate text
 
     // Noise Texture
-    PNGImage noise1 = loadPNGFile("../res/textures/noise/cloud_noise1.png");
-    noise1_texture_id = generateTexture(&noise1);
-
-    PNGImage noise2 = loadPNGFile("../res/textures/noise/cloud_noise2.png");
-    noise2_texture_id = generateTexture(&noise2);
+    PNGImage noise = loadPNGFile("../res/textures/noise/cloud_noise.png");
+    noise1_texture_id = generateTexture(&noise);
 
     // Box Texture
     PNGImage box_diffuse_image = loadPNGFile("../res/textures/Brick03_col.png");
@@ -477,7 +474,6 @@ void renderNode(SceneNode* node) {
 
                 // Noise
                 glBindTextureUnit(0, noise1_texture_id);
-                glBindTextureUnit(1, noise2_texture_id);
 
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);

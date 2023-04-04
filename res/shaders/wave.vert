@@ -64,9 +64,9 @@ vec3 wave_normal(GerstnerWave w, vec3 p) {
 
 void main()
 {
-    GerstnerWave wave1 = GerstnerWave(vec2(1), 0.5, 10);
-    GerstnerWave wave2 = GerstnerWave(vec2(0, 1), 0.25, 20);
-    GerstnerWave wave3 = GerstnerWave(vec2(-0.25, -0.5), 0.7, 60);
+    GerstnerWave wave1 = GerstnerWave(vec2(1, 1), 0.25, 30);
+    GerstnerWave wave2 = GerstnerWave(vec2(1, 0.6), 0.25, 15);
+    GerstnerWave wave3 = GerstnerWave(vec2(1, 1.3), 0.25, 12);
 
     vec3 wave_position = position;
 
@@ -75,18 +75,17 @@ void main()
     wave_position += wave_function(wave3, position);
     wave_position -= (W_N - 1) * position;
 
-
-    vec3 wave_normal = normal_in;
-    wave_normal += wave_normal(wave1, normal_in);
-    wave_normal += wave_normal(wave2, normal_in);
-    wave_normal += wave_normal(wave3, normal_in);
-    wave_normal -= (W_N - 1) * normal_in;
-
     height_out = wave_position.y;
     a_out = max( max(wave1.steepness, wave2.steepness), wave3.steepness );
 
+    vec3 w_n = normal_in;
+    w_n += wave_normal(wave1, normal_in);
+    w_n += wave_normal(wave2, normal_in);
+    w_n += wave_normal(wave3, normal_in);
+    w_n -= (W_N - 1) * normal_in;
+
     // OUT
-    normal_out = wave_normal;
+    normal_out = w_n;
     textureCoordinates_out = textureCoordinates_in;
     position_out = wave_position;
 
