@@ -1,5 +1,7 @@
 #include <iostream>
 #include "shapes.h"
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265359f
@@ -290,29 +292,50 @@ Mesh generatePlane(int tesselation, glm::vec2 size) {
     return plane;
 }
 
-Mesh generateTestTriangle() {
-    Mesh triangle;
+Mesh load_obj(const std::string &file) {
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
 
-    int scale = 5;
+    std::string error;
+    std::string warning;
 
-    triangle.textureCoordinates.push_back(glm::vec2(0,0));
-    triangle.textureCoordinates.push_back(glm::vec2(0,1));
-    triangle.textureCoordinates.push_back(glm::vec2(1,0));
-    triangle.textureCoordinates.push_back(glm::vec2(1,1));
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warning, &error, file.c_str(), nullptr, true);
 
-    triangle.normals.push_back(glm::vec3(0, -1, 0));
+    if (!ret) {exit(1);}
 
-    triangle.vertices.push_back(glm::vec3(0.5 * scale, 0.5 * scale, 0.0));
-    triangle.vertices.push_back(glm::vec3(0.5 * scale, -0.5 * scale, 0.0));
-    triangle.vertices.push_back(glm::vec3(-0.5 * scale, -0.5 * scale, 0.0));
-    triangle.vertices.push_back(glm::vec3(-0.5 * scale, 0.5 * scale, 0.0));
+    if (shapes.size() > 1){
+        std::cerr << "More than 1 mesh in the file" << std::endl;
+    }
 
-    triangle.indices.push_back(0);
-    triangle.indices.push_back(1);
-    triangle.indices.push_back(3);
-    triangle.indices.push_back(1);
-    triangle.indices.push_back(2);
-    triangle.indices.push_back(3);
+    if (shapes.empty()){
+        std::cerr << "File does not contain meshes" << std::endl;
+    }
 
-    return triangle;
+    const auto &shape = shapes.front();
+    std::cout << "   " << shape.name << " | " << "File: " << file << std::endl;
+    const auto &tmesh = shape.mesh;
+
+    Mesh object;
+
+    for (const auto idx : tmesh.indices) {
+        object.indices.push_back(object.indices.size());
+        glm::vec3 vertex;
+        vertex.x = attrib.vertices.at(3*idx.vertex_index+0);
+        vertex.y = attrib.vertices.at(3*idx.vertex_index+1);
+        vertex.z = attrib.vertices.at(3*idx.vertex_index+2);
+        object.vertices.push_back(vertex);
+        glm::vec3 normal;
+        normal.x = attrib.normals.at(3*idx.normal_index+0);
+        normal.y = attrib.normals.at(3*idx.normal_index+1);
+        normal.z = attrib.normals.at(3*idx.normal_index+2);
+        object.normals.push_back(normal);
+        glm::vec3 uv;
+        uv.x = attrib.texcoords.at(2*idx.texcoord_index+0);
+        uv.y = attrib.texcoords.at(2*idx.texcoord_index+1);
+        object.textureCoordinates.push_back(uv);
+    }
+
+    return object;
 }
+

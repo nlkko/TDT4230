@@ -41,11 +41,11 @@ SceneNode* textNode;
 
 SceneNode* waveNode;
 SceneNode* skyboxNode;
+SceneNode* boatNode;
 
 glm::mat4 VP;
 
-unsigned int noise1_texture_id;
-unsigned int noise2_texture_id;
+unsigned int noise_texture_id;
 
 const int N_LIGHTS = 3;
 
@@ -57,6 +57,7 @@ Gloom::Shader* shader;
 Gloom::Shader* shader_2d;
 Gloom::Shader* shader_skybox;
 Gloom::Shader* shader_wave;
+Gloom::Shader* shader_object;
 
 sf::Sound* sound;
 
@@ -129,6 +130,9 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     shader_wave = new Gloom::Shader();
     shader_wave->makeBasicShader("../res/shaders/wave.vert", "../res/shaders/wave.frag");
 
+    shader_object = new Gloom::Shader();
+    shader_object->makeBasicShader("../res/shaders/object.vert", "../res/shaders/object.frag");
+
     // Create meshes
     Mesh testCube = cube(glm::vec3(50, 20, 20), glm::vec2(40, 40), true);
     Mesh pad = cube(padDimensions, glm::vec2(30, 40), true);
@@ -136,6 +140,10 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     Mesh skybox = cube(glm::vec3(360, 360, 360), glm::vec2(90), true, true);
     Mesh wave = generatePlane(200, glm::vec2(50, 100));
+
+    std::cout << "Objects:" << std::endl;
+    Mesh boat = load_obj("../res/objects/boat.obj");
+    std::cout << std::endl;
 
     // Text Texture
     float char_width = 29.0;
@@ -147,9 +155,13 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int texture_id = generateTexture(&charmap); // Generate textures
     Mesh text_mesh = generateTextGeometryBuffer(displayed_text, char_height / char_width, mesh_width); // Generate text
 
+    // Object Textures
+    PNGImage boat_texture = loadPNGFile("../res/textures/objects/boat.png");
+    unsigned int boat_texture_id = generateTexture(&boat_texture);
+
     // Noise Texture
     PNGImage noise = loadPNGFile("../res/textures/noise/cloud_noise.png");
-    noise1_texture_id = generateTexture(&noise);
+    noise_texture_id = generateTexture(&noise);
 
     // Box Texture
     PNGImage box_diffuse_image = loadPNGFile("../res/textures/Brick03_col.png");
@@ -159,13 +171,16 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int box_normal_map_id = generateTexture(&box_normal_image);
 
     // Skybox Texture
+
+    std::string skybox_type = "dusk";
+
     std::vector<PNGImage> faces;
-    faces.push_back(loadPNGFile("../res/textures/dusk/right.png"));
-    faces.push_back(loadPNGFile("../res/textures/dusk/left.png"));
-    faces.push_back(loadPNGFile("../res/textures/dusk/top.png"));
-    faces.push_back(loadPNGFile("../res/textures/dusk/bottom.png"));
-    faces.push_back(loadPNGFile("../res/textures/dusk/back.png"));
-    faces.push_back(loadPNGFile("../res/textures/dusk/front.png"));
+    faces.push_back(loadPNGFile(fmt::format("../res/textures/{}/right.png", skybox_type)));
+    faces.push_back(loadPNGFile(fmt::format("../res/textures/{}/left.png", skybox_type)));
+    faces.push_back(loadPNGFile(fmt::format("../res/textures/{}/top.png", skybox_type)));
+    faces.push_back(loadPNGFile(fmt::format("../res/textures/{}/bottom.png", skybox_type)));
+    faces.push_back(loadPNGFile(fmt::format("../res/textures/{}/back.png", skybox_type)));
+    faces.push_back(loadPNGFile(fmt::format("../res/textures/{}/front.png", skybox_type)));
 
     // Create lights
     for (int i = 0; i < N_LIGHTS; i++) {
@@ -191,12 +206,14 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int testCubeVAO = generateBuffer(testCube);
 
     unsigned int skyboxVAO  = generateBuffer(skybox);
+    unsigned int boatVAO    = generateBuffer(boat);
     unsigned int waveVAO    = generateBuffer(wave);
 
     // Construct scene
     rootNode     = createSceneNode();
     skyboxNode   = createSceneNode();
     waveNode     = createSceneNode();
+    boatNode     = createSceneNode();
 
     boxNode  = createSceneNode();
     padNode  = createSceneNode();
@@ -207,9 +224,11 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     boxNode     ->nodeType = NORMAL_MAPPED_GEOMETRY;
     skyboxNode  ->nodeType = SKYBOX;
     waveNode    ->nodeType = WAVE;
+    boatNode    ->nodeType = OBJECT;
 
     // Properties
     skyboxNode  ->texture_id = generateCubemap(faces);
+    boatNode    ->texture_id = boat_texture_id;
 
     textNode    ->texture_id = texture_id;
 
@@ -228,6 +247,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     boxNode     ->children.push_back(lightSources[0].node);
     boxNode     ->children.push_back(lightSources[1].node);
 
+    rootNode    ->children.push_back(boatNode);
     rootNode    ->children.push_back(waveNode);
 
 
@@ -237,6 +257,9 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // VAO
     skyboxNode->vertexArrayObjectID = skyboxVAO;
     skyboxNode->VAOIndexCount       = skybox.indices.size();
+
+    boatNode->vertexArrayObjectID   = boatVAO;
+    boatNode->VAOIndexCount         = boat.indices.size();
 
     waveNode->vertexArrayObjectID  = waveVAO;
     waveNode->VAOIndexCount        = wave.indices.size();
@@ -306,7 +329,9 @@ void updateFrame(GLFWwindow* window) {
     // Move and rotate various SceneNodes
     boxNode->position    = { 0, -10, -80 };
     textNode->position   = glm::vec3(0.0, 0.0, 0.0);
-    waveNode->position   = glm::vec3(-60.0, -45.0, -180.0);
+    waveNode->position   = glm::vec3(-60.0, -60.0, -180.0);
+    boatNode->position   = glm::vec3(-150.0, -60.0, -150.0);
+    boatNode->scale      = glm::vec3(40);
     waveNode->scale      = glm::vec3(2);
     skyboxNode->position = cameraPosition;
     //waveNode->rotation += glm::vec3(getTimeDeltaSeconds() / 2, 0, 0);
@@ -355,6 +380,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
         case NORMAL_MAPPED_GEOMETRY: break;
         case SKYBOX: break;
         case WAVE: break;
+        case OBJECT: break;
     }
 
     for(SceneNode* child : node->children) {
@@ -473,7 +499,27 @@ void renderNode(SceneNode* node) {
                 glUniform1f(5, gameElapsedTime);
 
                 // Noise
-                glBindTextureUnit(0, noise1_texture_id);
+                glBindTextureUnit(0, noise_texture_id);
+
+                glBindVertexArray(node->vertexArrayObjectID);
+                glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+            }
+
+            break;
+        }
+
+        case OBJECT: {
+            if (node->vertexArrayObjectID != -1) {
+                shader_object->activate();
+
+                // MVP
+                glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(node->MVP));
+
+                // Total Elapsed Time
+                glUniform1f(5, gameElapsedTime);
+
+                // Texture
+                glBindTextureUnit(0, node->texture_id);
 
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);

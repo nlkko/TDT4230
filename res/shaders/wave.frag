@@ -9,7 +9,7 @@ in layout(location = 4) float amplitude;
 
 uniform layout(binding = 0) sampler2D noise;
 
-uniform vec3 sun_direction = vec3(0, 1, 0.0);
+uniform vec3 sun_direction = vec3(1, 1, 0);
 
 uniform layout(location = 5) float time;
 
@@ -19,8 +19,10 @@ uniform layout(location = 5) float time;
 uniform vec3 start_color = normalize(vec3(52, 77, 191));
 uniform vec3 end_color = normalize(vec3(78, 108, 245));
 
-//vec3(87, 105, 187)
-//vec3(0.772, 1.0, 0.952);
+// BLUE
+// vec3(52, 77, 191)
+// vec3(78, 108, 245)
+
 uniform float i = 0.05; // intensity
 uniform float min_threshold = 0.699;
 uniform float max_threshold = 0.7;
@@ -45,10 +47,12 @@ void main()
 
     vec4 d_mix = mix(d1, d2, 0.5);
 
+
+    /*
+
     if (d_mix.z > 0.3 && d_mix.x < 0.3 && d_mix.y < 0.4) {
         color = vec4(1.0, 1.0, 1.0, 0.8);
     } else {
-
         //float foam_level = 1 - (textureCoordinates.y / 0.05);
         float foam_level = pow(5, -25 * textureCoordinates.y);
         float foam_osc = sin(time/5);
@@ -56,9 +60,9 @@ void main()
         if (textureCoordinates.y < 0.15) color = vec4(gradient(start_color, end_color, scale) + vec3(1.0) * foam_level * abs(foam_osc), 0.8);
         else color = vec4(gradient(start_color, end_color, scale), 0.8);
 
-
     }
 
+    */
 
-
+    color = vec4(normal + 0.5, 1.0);
 }

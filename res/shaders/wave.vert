@@ -38,7 +38,7 @@ vec3 wave_function(GerstnerWave w, vec3 p) {
     return p;
 }
 
-vec3 wave_normal(GerstnerWave w, vec3 p) {
+vec3 wave_tangent(GerstnerWave w, vec3 p) {
     float k = (2*PI) / w.wavelength;
     float c = sqrt(G / k);
     vec2 d = normalize(w.direction);
@@ -46,46 +46,57 @@ vec3 wave_normal(GerstnerWave w, vec3 p) {
     float a = w.steepness / k;
 
     vec3 tangent = vec3(
-        1 - d.x * d.x * (w.steepness * sin(f)),
+        -d.x * d.x * (w.steepness * sin(f)),
         d.x * (w.steepness * cos(f)),
         -d.x * d.y * (w.steepness * sin(f))
     );
 
+    return tangent;
+}
+
+vec3 wave_binormal(GerstnerWave w, vec3 p) {
+    float k = (2*PI) / w.wavelength;
+    float c = sqrt(G / k);
+    vec2 d = normalize(w.direction);
+    float f = k * (dot(d, p.xz) - (time * c));
+    float a = w.steepness / k;
+
     vec3 binormal = vec3(
-        -d.x * d.y * ( w.steepness * sin(f) ),
-        d.y * ( w.steepness * cos(f) ),
-        1 - d.y * d.y * (w.steepness * sin(f))
+    -d.x * d.y * ( w.steepness * sin(f) ),
+    d.y * ( w.steepness * cos(f) ),
+    -d.y * d.y * (w.steepness * sin(f))
     );
 
-    vec3 normal = normalize(cross(binormal, tangent));
-
-    return normal;
+    return binormal;
 }
 
 void main()
 {
-    GerstnerWave wave1 = GerstnerWave(vec2(1, 1), 0.25, 30);
-    GerstnerWave wave2 = GerstnerWave(vec2(1, 0.6), 0.25, 15);
-    GerstnerWave wave3 = GerstnerWave(vec2(1, 1.3), 0.25, 12);
+    GerstnerWave waves[W_N];
+
+    waves[0] = GerstnerWave(vec2(1, 1), 0.25, 30);
+    waves[1] = GerstnerWave(vec2(1, 0.6), 0.25, 15);
+    waves[2] = GerstnerWave(vec2(1, 1.3), 0.25, 12);
 
     vec3 wave_position = position;
+    vec3 w_tangent = vec3(0);
+    vec3 w_binormal = vec3(0);
 
-    wave_position = wave_function(wave1, position);
-    wave_position += wave_function(wave2, position);
-    wave_position += wave_function(wave3, position);
-    wave_position -= (W_N - 1) * position;
+    for(int i=0; i < W_N; ++i) {
+        wave_position += wave_function(waves[i], position);
+        w_tangent += wave_tangent(waves[i], position);
+        w_binormal += wave_binormal(waves[i], position);
+    }
 
-    height_out = wave_position.y;
-    a_out = max( max(wave1.steepness, wave2.steepness), wave3.steepness );
+    wave_position -= (W_N) * position;
+    w_tangent -= (W_N) * position;
+    w_binormal -= (W_N) * position;
 
-    vec3 w_n = normal_in;
-    w_n += wave_normal(wave1, normal_in);
-    w_n += wave_normal(wave2, normal_in);
-    w_n += wave_normal(wave3, normal_in);
-    w_n -= (W_N - 1) * normal_in;
 
     // OUT
-    normal_out = w_n;
+    height_out = wave_position.y;
+    a_out = max( max(waves[0].steepness, waves[1].steepness), waves[2].steepness );
+    normal_out = normalize(cross(w_binormal, w_tangent));
     textureCoordinates_out = textureCoordinates_in;
     position_out = wave_position;
 
