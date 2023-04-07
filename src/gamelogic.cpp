@@ -39,9 +39,10 @@ SceneNode* boxNode;
 SceneNode* padNode;
 SceneNode* textNode;
 
-SceneNode* waveNode;
 SceneNode* skyboxNode;
+SceneNode* waveNode;
 SceneNode* boatNode;
+SceneNode* coastNode;
 
 glm::mat4 VP;
 
@@ -138,11 +139,12 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh pad = cube(padDimensions, glm::vec2(30, 40), true);
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
 
-    Mesh skybox = cube(glm::vec3(360, 360, 360), glm::vec2(90), true, true);
-    Mesh wave = generatePlane(200, glm::vec2(50, 100));
+    Mesh skybox = cube(glm::vec3(400, 400, 400), glm::vec2(90), true, true);
+    Mesh wave = generatePlane(200, glm::vec2(700, 700));
 
     std::cout << "Objects:" << std::endl;
     Mesh boat = load_obj("../res/objects/boat.obj");
+    Mesh coast = load_obj("../res/objects/coast.obj");
     std::cout << std::endl;
 
     // Text Texture
@@ -172,7 +174,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // Skybox Texture
 
-    std::string skybox_type = "dusk";
+    std::string skybox_type = "day2";
 
     std::vector<PNGImage> faces;
     faces.push_back(loadPNGFile(fmt::format("../res/textures/{}/right.png", skybox_type)));
@@ -208,12 +210,14 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     unsigned int skyboxVAO  = generateBuffer(skybox);
     unsigned int boatVAO    = generateBuffer(boat);
     unsigned int waveVAO    = generateBuffer(wave);
+    unsigned int coastVAO   = generateBuffer(coast);
 
     // Construct scene
     rootNode     = createSceneNode();
     skyboxNode   = createSceneNode();
     waveNode     = createSceneNode();
     boatNode     = createSceneNode();
+    coastNode    = createSceneNode();
 
     boxNode  = createSceneNode();
     padNode  = createSceneNode();
@@ -225,6 +229,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     skyboxNode  ->nodeType = SKYBOX;
     waveNode    ->nodeType = WAVE;
     boatNode    ->nodeType = OBJECT;
+    coastNode   ->nodeType = OBJECT;
 
     // Properties
     skyboxNode  ->texture_id = generateCubemap(faces);
@@ -238,17 +243,21 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Push
     rootNode    ->children.push_back(skyboxNode);
 
+    rootNode    ->children.push_back(boatNode);
+
+    rootNode    ->children.push_back(coastNode);
+    rootNode    ->children.push_back(waveNode);
+
 
     //rootNode->children.push_back(boxNode);
     //rootNode    ->children.push_back(padNode);
-    rootNode    ->children.push_back(textNode);
+    //rootNode    ->children.push_back(textNode);
 
     // Stationary Lights
     boxNode     ->children.push_back(lightSources[0].node);
     boxNode     ->children.push_back(lightSources[1].node);
 
-    rootNode    ->children.push_back(boatNode);
-    rootNode    ->children.push_back(waveNode);
+
 
 
     // Dynamic Lights
@@ -263,6 +272,9 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     waveNode->vertexArrayObjectID  = waveVAO;
     waveNode->VAOIndexCount        = wave.indices.size();
+
+    coastNode->vertexArrayObjectID = coastVAO;
+    coastNode->VAOIndexCount       = coast.indices.size();
 
     boxNode->vertexArrayObjectID    = boxVAO;
     boxNode->VAOIndexCount          = box.indices.size();
@@ -304,9 +316,9 @@ void updateFrame(GLFWwindow* window) {
         mouseRightPressed = false;
     }
 
-    glm::mat4 projection = glm::perspective(glm::radians(80.0f), float(windowWidth) / float(windowHeight), 0.1f, 350.f);
+    glm::mat4 projection = glm::perspective(glm::radians(80.0f), float(windowWidth) / float(windowHeight), 0.1f, 1000.f);
 
-    cameraPosition = glm::vec3(0, 2, -20);
+    cameraPosition = glm::vec3(0, -35, -20);
     //cameraPosition += glm::vec3(1, 0, 0);
 
     // Some math to make the camera move in a nice way
@@ -327,13 +339,28 @@ void updateFrame(GLFWwindow* window) {
     VP = projection * cameraTransform;
 
     // Move and rotate various SceneNodes
+    skyboxNode->position = cameraPosition;
+
+    boatNode->position   = glm::vec3(-80.0, -60.0, -150.0);
+    boatNode->scale      = glm::vec3(20);
+
+    waveNode->position   = glm::vec3(80.0, -60.0, -1500.0);
+    waveNode->scale      = glm::vec3(2);
+    waveNode->rotation  = glm::vec3(0, -0.5, 0);
+
+    coastNode->position  = glm::vec3(-150.0, -55.0, -190.0);
+    coastNode->scale     = glm::vec3(1);
+    coastNode->rotation  = glm::vec3(0, -0.5, 0);
+
     boxNode->position    = { 0, -10, -80 };
     textNode->position   = glm::vec3(0.0, 0.0, 0.0);
-    waveNode->position   = glm::vec3(-60.0, -60.0, -180.0);
-    boatNode->position   = glm::vec3(-150.0, -60.0, -150.0);
-    boatNode->scale      = glm::vec3(40);
-    waveNode->scale      = glm::vec3(2);
-    skyboxNode->position = cameraPosition;
+
+
+
+
+
+
+
     //waveNode->rotation += glm::vec3(getTimeDeltaSeconds() / 2, 0, 0);
 
     /*
@@ -390,7 +417,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 
 void renderNode(SceneNode* node) {
     if (node->nodeType != GEOMETRY_2D && node->nodeType != SKYBOX) {
-        shader->activate();
+        //shader->activate();
 
         // M
         glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(node->currentTransformationMatrix));
@@ -483,6 +510,7 @@ void renderNode(SceneNode* node) {
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
                 glDepthMask(GL_TRUE);
+                shader_skybox->deactivate();
             }
 
             break;
@@ -503,6 +531,7 @@ void renderNode(SceneNode* node) {
 
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+                shader_wave->deactivate();
             }
 
             break;
@@ -523,6 +552,7 @@ void renderNode(SceneNode* node) {
 
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+                shader_object->deactivate();
             }
 
             break;

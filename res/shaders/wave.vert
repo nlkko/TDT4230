@@ -62,9 +62,9 @@ vec3 wave_binormal(GerstnerWave w, vec3 p) {
     float a = w.steepness / k;
 
     vec3 binormal = vec3(
-    -d.x * d.y * ( w.steepness * sin(f) ),
-    d.y * ( w.steepness * cos(f) ),
-    -d.y * d.y * (w.steepness * sin(f))
+        -d.x * d.y * ( w.steepness * sin(f) ),
+        d.y * ( w.steepness * cos(f) ),
+        -d.y * d.y * (w.steepness * sin(f))
     );
 
     return binormal;
@@ -74,9 +74,9 @@ void main()
 {
     GerstnerWave waves[W_N];
 
-    waves[0] = GerstnerWave(vec2(1, 1), 0.25, 30);
-    waves[1] = GerstnerWave(vec2(1, 0.6), 0.25, 15);
-    waves[2] = GerstnerWave(vec2(1, 1.3), 0.25, 12);
+    waves[0] = GerstnerWave(vec2(-1, -1), 0.15, 30);
+    waves[1] = GerstnerWave(vec2(-1, -0.6), 0.20, 15);
+    waves[2] = GerstnerWave(vec2(-1, -1.3), 0.18, 12);
 
     vec3 wave_position = position;
     vec3 w_tangent = vec3(0);

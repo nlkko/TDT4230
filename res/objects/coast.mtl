@@ -1,0 +1,312 @@
+# Blender 3.5.0 MTL File: 'coast3.blend'
+# www.blender.org
+
+newmtl LPEP_Atlas01.001
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.003
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.004
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.007
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.008
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.009
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.010
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.011
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.012
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.013
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.014
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.015
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.016
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.017
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.018
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.019
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.020
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.021
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.023
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.024
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.025
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.026
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.027
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.028
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.029
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.030
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.031
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.035
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.036
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.038
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
