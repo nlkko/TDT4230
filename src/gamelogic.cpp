@@ -140,7 +140,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     Mesh box = cube(boxDimensions, glm::vec2(90), true, true);
 
     Mesh skybox = cube(glm::vec3(400, 400, 400), glm::vec2(90), true, true);
-    Mesh wave = generatePlane(200, glm::vec2(700, 700));
+    Mesh wave = generatePlane(500, glm::vec2(700, 700));
 
     std::cout << "Objects:" << std::endl;
     Mesh boat = load_obj("../res/objects/boat.obj");
@@ -159,7 +159,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // Object Textures
     PNGImage boat_texture = loadPNGFile("../res/textures/objects/boat.png");
-    unsigned int boat_texture_id = generateTexture(&boat_texture);
+    PNGImage coast_texture = loadPNGFile("../res/textures/objects/coastline.png");
 
     // Noise Texture
     PNGImage noise = loadPNGFile("../res/textures/noise/cloud_noise.png");
@@ -233,7 +233,8 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     // Properties
     skyboxNode  ->texture_id = generateCubemap(faces);
-    boatNode    ->texture_id = boat_texture_id;
+    boatNode    ->texture_id = generateTexture(&boat_texture);
+    coastNode   ->texture_id = generateTexture(&coast_texture);
 
     textNode    ->texture_id = texture_id;
 
@@ -243,10 +244,11 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
     // Push
     rootNode    ->children.push_back(skyboxNode);
 
-    rootNode    ->children.push_back(boatNode);
+
 
     rootNode    ->children.push_back(coastNode);
     rootNode    ->children.push_back(waveNode);
+    rootNode    ->children.push_back(boatNode);
 
 
     //rootNode->children.push_back(boxNode);
@@ -318,14 +320,14 @@ void updateFrame(GLFWwindow* window) {
 
     glm::mat4 projection = glm::perspective(glm::radians(80.0f), float(windowWidth) / float(windowHeight), 0.1f, 1000.f);
 
-    cameraPosition = glm::vec3(0, -35, -20);
+    cameraPosition = glm::vec3(0, -38, -20);
     //cameraPosition += glm::vec3(1, 0, 0);
 
     // Some math to make the camera move in a nice way
     float lookRotation = -0.6 / (1 + exp(-5 * (viewpointX - 0.5))) + 0.3;
     glm::mat4 cameraTransform =
             glm::rotate(0.3f + 0.2f * float(-viewpointZ * viewpointZ), glm::vec3(1, 0, 0)) *
-            glm::rotate(lookRotation, glm::vec3(0, 1, 0)) *
+            glm::rotate(lookRotation, glm::vec3((cos(gameElapsedTime)/6), 0.9, (sin(gameElapsedTime)/3))) *
             glm::translate(-cameraPosition);
 
 
@@ -341,7 +343,9 @@ void updateFrame(GLFWwindow* window) {
     // Move and rotate various SceneNodes
     skyboxNode->position = cameraPosition;
 
-    boatNode->position   = glm::vec3(-80.0, -60.0, -150.0);
+
+    boatNode->position   = glm::vec3(0.0, -58.0, -26.0);
+    boatNode->rotation   = glm::vec3((cos(gameElapsedTime)/12), -0.7, (sin(gameElapsedTime)/10));
     boatNode->scale      = glm::vec3(20);
 
     waveNode->position   = glm::vec3(80.0, -60.0, -1500.0);

@@ -310,3 +310,13 @@ Ni 1.500000
 d 1.000000
 illum 1
 map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
+
+newmtl LPEP_Atlas01.039
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.294100 0.294100 0.294100
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd D:/Users/Dorde/Downloads/CgTraderVersion/D:/ASP_2018/LowPolyEnviroPack_2018/texture_LowPolyMegaSet/LowPolyEnviro_Color.png
