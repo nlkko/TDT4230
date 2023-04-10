@@ -19,14 +19,14 @@ uniform layout(location = 5) float time;
 uniform vec3 start_color = normalize(vec3(52, 77, 191));
 uniform vec3 end_color = normalize(vec3(78, 108, 245));
 
-// BLUE
-// vec3(52, 77, 191)
-// vec3(78, 108, 245)
-
-uniform float i = 0.05; // intensity
-uniform float min_threshold = 0.699;
-uniform float max_threshold = 0.7;
 uniform float texture_scale = 10;
+uniform vec3 island_position = vec3(140.0, -55.0, 600.0);
+
+float distance3v(vec3 i, vec3 p) {
+    return sqrt(
+        pow(i.x-p.x, 2) + pow(i.y-p.y, 2) + pow(i.z-p.z, 2)
+    );
+}
 
 vec3 gradient(vec3 start_color, vec3 end_color, float value) {
     return vec3(
@@ -41,16 +41,22 @@ out vec4 color;
 void main()
 {
     float scale = height / amplitude * 0.3;
+    float i_d = distance3v(position, island_position);
 
-    vec4 d1 = texture2D(noise, vec2(textureCoordinates.x, textureCoordinates.y - time/150) * texture_scale);
-    vec4 d2 = texture2D(noise, vec2(textureCoordinates.x - time/150, textureCoordinates.y) * texture_scale);
+    vec4 d1 = texture2D(noise, vec2(textureCoordinates.x, textureCoordinates.y - time/200) * texture_scale);
+    vec4 d2 = texture2D(noise, vec2(textureCoordinates.x - time/200, textureCoordinates.y) * texture_scale);
 
     vec4 d_mix = mix(d1, d2, 0.5);
 
     float angle = dot(normal, sun_direction);
+    float i_angle = dot(position, island_position);
     vec3 gradient_color = gradient(start_color, end_color, scale);
 
-    if (d_mix.z > 0.3 && d_mix.x < 0.3 && d_mix.y < 0.4) {
+    if (i_d < 150 && sin(i_d + time)  * cos(i_angle * 0.003 + time) > 0.5) {
+        color = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+
+    else if (d_mix.z > 0.3 && d_mix.x < 0.3 && d_mix.y < 0.4) {
         color = vec4(1.0, 1.0, 1.0, 1.0);
     } else {
         //float foam_level = 1 - (textureCoordinates.y / 0.05);
@@ -58,7 +64,7 @@ void main()
         float foam_osc = sin(time/5);
 
         if (textureCoordinates.y < 0.15) color = vec4(gradient(start_color, end_color, scale) + vec3(1.0) * foam_level * abs(foam_osc), 1.0);
-        else color = vec4(gradient(start_color, end_color, scale), 1.0);
+        else color = vec4(gradient(start_color, end_color, scale), abs(i_d/165));
 
     }
 
