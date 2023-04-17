@@ -83,7 +83,7 @@ double lastMouseY = windowHeight / 2;
 void mouseCallback(GLFWwindow* window, double x, double y) {
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
-    glViewport(0, 0, windowWidth, windowHeight);
+    //glViewport(0, 0, windowWidth, windowHeight);
 
     double deltaX = x - lastMouseX;
     double deltaY = y - lastMouseY;
@@ -133,6 +133,7 @@ void initGame(GLFWwindow* window, CommandLineOptions gameOptions) {
 
     shader_object = new Gloom::Shader();
     shader_object->makeBasicShader("../res/shaders/object.vert", "../res/shaders/object.frag");
+
 
     // Create meshes
     Mesh testCube = cube(glm::vec3(50, 20, 20), glm::vec2(40, 40), true);
@@ -420,6 +421,7 @@ void updateNodeTransformations(SceneNode* node, glm::mat4 transformationThusFar)
 }
 
 void renderNode(SceneNode* node) {
+
     if (node->nodeType != GEOMETRY_2D && node->nodeType != SKYBOX) {
         //shader->activate();
 
@@ -534,6 +536,7 @@ void renderNode(SceneNode* node) {
                 glBindTextureUnit(0, noise_texture_id);
 
                 glBindVertexArray(node->vertexArrayObjectID);
+
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
                 shader_wave->deactivate();
             }
@@ -556,6 +559,7 @@ void renderNode(SceneNode* node) {
 
                 glBindVertexArray(node->vertexArrayObjectID);
                 glDrawElements(GL_TRIANGLES, node->VAOIndexCount, GL_UNSIGNED_INT, nullptr);
+
                 shader_object->deactivate();
             }
 
@@ -571,7 +575,6 @@ void renderNode(SceneNode* node) {
 void renderFrame(GLFWwindow* window) {
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
-    glViewport(0, 0, windowWidth, windowHeight);
 
     renderNode(rootNode);
 }

@@ -52,20 +52,18 @@ void main()
     float i_angle = dot(position, island_position);
     vec3 gradient_color = gradient(start_color, end_color, scale);
 
-    if (i_d < 150 && sin(i_d + time)  * cos(i_angle * 0.003 + time) > 0.5) {
-        color = vec4(1.0, 0.0, 0.0, 1.0);
+    if (i_d < 130 && sin(i_d + time*2) + cos(i_d + position.x) > 0.8) {
+        color = vec4(1.0, 1.0, 1.0, 0.8);
     }
 
     else if (d_mix.z > 0.3 && d_mix.x < 0.3 && d_mix.y < 0.4) {
-        color = vec4(1.0, 1.0, 1.0, 1.0);
+        color = vec4(1.0, 1.0, 1.0, 0.8);
     } else {
-        //float foam_level = 1 - (textureCoordinates.y / 0.05);
         float foam_level = pow(5, -25 * textureCoordinates.y);
         float foam_osc = sin(time/5);
 
         if (textureCoordinates.y < 0.15) color = vec4(gradient(start_color, end_color, scale) + vec3(1.0) * foam_level * abs(foam_osc), 1.0);
         else color = vec4(gradient(start_color, end_color, scale), abs(i_d/165));
-
     }
 
     // Shade
